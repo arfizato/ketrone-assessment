@@ -13,17 +13,11 @@
  *   4. register it in FIELD_COMPONENTS in page.tsx
  */
 
-export type FieldType = "text" | "select" | "radio" | "file" | "list" | "table"
+export type FieldType = "text" | "select" | "file" | "table"
 
 export type SelectOption = {
   label: string
   value: string
-}
-
-/** A name + percentage pair, for the dynamic repeatable-list field. */
-export type ListRow = {
-  name: string
-  percentage: string
 }
 
 /** A column definition for the table field; the filler adds rows at fill time. */
@@ -46,11 +40,8 @@ export type FieldData = {
    */
   validation?: string
 
-  /** select & radio fields */
+  /** select fields */
   options?: SelectOption[]
-
-  /** dynamic repeatable list fields */
-  rows?: ListRow[]
 
   /** table fields: user-defined columns; the filler adds rows at fill time */
   columns?: TableColumn[]
@@ -82,8 +73,6 @@ export type FieldFormProps = {
 export const DEFAULT_FIELD_DATA: Record<FieldType, FieldData> = {
   text: {},
   select: { options: [{ label: "", value: "" }] },
-  radio: { options: [{ label: "", value: "" }] },
   file: { validation: "All" },
-  list: { rows: [{ name: "", percentage: "" }] },
   table: { columns: [{ label: "", type: "Text" }] },
 }

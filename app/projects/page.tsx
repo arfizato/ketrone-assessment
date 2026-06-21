@@ -12,7 +12,6 @@ import {
   FieldType,
 } from "@/components/fieldForms/types"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
 import {
   ResizableHandle,
   ResizablePanel,
@@ -30,27 +29,13 @@ type PaletteItem = {
 const FIELD_PALETTE: PaletteItem[] = [
   { name: "Text", type: "text" },
   { name: "Select", type: "select", desc: "select something man" },
-  { name: "Radio", type: "radio" },
   { name: "File", type: "file" },
-  { name: "List", type: "list" },
   { name: "Table", type: "table" },
 ]
-function PlaceholderForm({ field, remove }: FieldFormProps) {
-  return (
-    <Card className="flex-row items-center justify-between p-4">
-      <span className="bg-accent p-2">{field.type} field — coming soon</span>
-      <Button variant="ghost" onClick={remove}>
-        ❌
-      </Button>
-    </Card>
-  )
-}
 const FIELD_COMPONENTS: Record<FieldType, ComponentType<FieldFormProps>> = {
   text: TextForm,
   select: SelectForm,
-  radio: PlaceholderForm,
   file: FileForm,
-  list: PlaceholderForm,
   table: TableForm,
 }
 
