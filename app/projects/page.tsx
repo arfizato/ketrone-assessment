@@ -1,5 +1,6 @@
 "use client"
 
+import FileForm from "@/components/fieldForms/FileForm"
 import SelectForm from "@/components/fieldForms/SelectForm"
 import TextForm from "@/components/fieldForms/TextForm"
 import {
@@ -46,7 +47,7 @@ const FIELD_COMPONENTS: Record<FieldType, ComponentType<FieldFormProps>> = {
   text: TextForm,
   select: SelectForm,
   radio: PlaceholderForm,
-  file: PlaceholderForm,
+  file: FileForm,
   list: PlaceholderForm,
 }
 

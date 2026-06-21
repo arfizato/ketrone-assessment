@@ -36,7 +36,7 @@ export type FieldData = {
   required?: boolean
 
   /** text fields: "None" | "Email" | "URL" | "Number"
-   * TODO: file inputs "pdf" | "image" | "all" ...
+   *  file fields: "All" | "PDF" | "Image"
    */
   validation?: string
 
@@ -74,6 +74,6 @@ export const DEFAULT_FIELD_DATA: Record<FieldType, FieldData> = {
   text: {},
   select: { options: [{ label: "", value: "" }] },
   radio: { options: [{ label: "", value: "" }] },
-  file: {},
+  file: { validation: "All" },
   list: { rows: [{ name: "", percentage: "" }] },
 }
