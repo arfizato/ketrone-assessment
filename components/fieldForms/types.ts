@@ -58,15 +58,14 @@ export type FieldInstance = {
 }
 
 /**
- * The contract every field-config component shares.
- * `update` and `remove` are already bound to this field's id by the page.
+ * The contract every field-config component shares. Components only configure
+ * data; the page owns field lifecycle (add / remove / duplicate / reorder).
+ * `update` is already bound to this field's id by the page.
  */
 export type FieldFormProps = {
   field: FieldInstance
   /** merge a patch into this field's data */
   update: (patch: Partial<FieldData>) => void
-  /** drop this field from the form */
-  remove: () => void
 }
 
 /** Starting data when a field of a given type is first added. */

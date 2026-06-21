@@ -13,8 +13,9 @@ import {
 import { Input } from "../ui/input"
 import { Switch } from "../ui/switch"
 import { FieldFormProps, SelectOption } from "./types"
+import { Plus, X } from "lucide-react"
 
-function SelectForm({ field, update, remove }: FieldFormProps) {
+function SelectForm({ field, update }: FieldFormProps) {
   const { data } = field
   const opts = data.options ?? []
 
@@ -24,19 +25,12 @@ function SelectForm({ field, update, remove }: FieldFormProps) {
   const updateOpt = (index: number, patch: Partial<SelectOption>) =>
     setOpts(opts.map((o, i) => (i === index ? { ...o, ...patch } : o)))
 
-  const dropOpt = (index: number) =>
-    setOpts(opts.filter((_, i) => i !== index))
+  const dropOpt = (index: number) => setOpts(opts.filter((_, i) => i !== index))
 
   const addOpt = () => setOpts([...opts, { label: "", value: "" }])
 
   return (
     <Card className="p-4">
-      <div className="flex justify-end">
-        <Button variant="ghost" size="sm" onClick={remove}>
-          ❌
-        </Button>
-      </div>
-
       <Field aria-required>
         <FieldLabel>Label</FieldLabel>
         <Input
@@ -61,7 +55,12 @@ function SelectForm({ field, update, remove }: FieldFormProps) {
         <FieldTitle>Options</FieldTitle>
         {opts.map((opt, i) => (
           // TODO: Make em movable
-          <Field aria-required key={i} orientation="horizontal" className="px-2">
+          <Field
+            aria-required
+            key={i}
+            orientation="horizontal"
+            className="px-2"
+          >
             <span className="w-full">
               <FieldLabel>Label</FieldLabel>
               <Input
@@ -81,15 +80,26 @@ function SelectForm({ field, update, remove }: FieldFormProps) {
             </span>
             <span>
               <FieldLabel className="opacity-0">.</FieldLabel>
-              <Button variant="ghost" onClick={() => dropOpt(i)}>
-                ❌
+              <Button
+                variant="destructive"
+                size="icon"
+                aria-label="Remove option"
+                onClick={() => dropOpt(i)}
+              >
+                <X className="size-4" />
               </Button>
             </span>
             <FieldError></FieldError>
           </Field>
         ))}
-        <Button className="mt-2" onClick={addOpt}>
-          ➕
+        <Button
+          variant="outline"
+          size="sm"
+          className="mt-2 self-start"
+          onClick={addOpt}
+        >
+          <Plus className="size-4" />
+          Add option
         </Button>
       </FieldGroup>
 

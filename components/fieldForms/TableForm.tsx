@@ -21,10 +21,11 @@ import {
 } from "../ui/select"
 import { Switch } from "../ui/switch"
 import { FieldFormProps, TableColumn } from "./types"
+import { Plus, X } from "lucide-react"
 
 const COLUMN_TYPES = ["Text", "Number", "Date"]
 
-function TableForm({ field, update, remove }: FieldFormProps) {
+function TableForm({ field, update }: FieldFormProps) {
   const { data } = field
   const columns = data.columns ?? []
 
@@ -41,12 +42,6 @@ function TableForm({ field, update, remove }: FieldFormProps) {
 
   return (
     <Card className="p-4">
-      <div className="flex justify-end">
-        <Button variant="ghost" size="sm" onClick={remove}>
-          ❌
-        </Button>
-      </div>
-
       <Field aria-required>
         <FieldLabel>Label</FieldLabel>
         <Input
@@ -97,15 +92,26 @@ function TableForm({ field, update, remove }: FieldFormProps) {
             </span>
             <span>
               <FieldLabel className="opacity-0">.</FieldLabel>
-              <Button variant="ghost" onClick={() => dropColumn(i)}>
-                ❌
+              <Button
+                variant="destructive"
+                size="icon"
+                aria-label="Remove column"
+                onClick={() => dropColumn(i)}
+              >
+                <X className="size-4" />
               </Button>
             </span>
             <FieldError></FieldError>
           </Field>
         ))}
-        <Button className="mt-2" onClick={addColumn}>
-          ➕
+        <Button
+          variant="outline"
+          size="sm"
+          className="mt-2 self-start"
+          onClick={addColumn}
+        >
+          <Plus className="size-4" />
+          Add column
         </Button>
       </FieldGroup>
 

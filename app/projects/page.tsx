@@ -17,6 +17,25 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
+import { cn } from "@/lib/utils"
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core"
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
+import { Copy, GripVertical, Trash2 } from "lucide-react"
 import { ComponentType, useState } from "react"
 
 type PaletteItem = {
@@ -39,9 +58,77 @@ const FIELD_COMPONENTS: Record<FieldType, ComponentType<FieldFormProps>> = {
   table: TableForm,
 }
 
+/** One sortable field card with its drag / duplicate / delete control rail. */
+function SortableField({
+  field,
+  update,
+  remove,
+  duplicate,
+}: {
+  field: FieldInstance
+  update: (patch: Partial<FieldData>) => void
+  remove: () => void
+  duplicate: () => void
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: field.id })
+  const Comp = FIELD_COMPONENTS[field.type]
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+      className={cn(
+        "flex items-start gap-2 py-2",
+        isDragging && "relative z-10 opacity-60",
+      )}
+    >
+      <div className="flex flex-col gap-1 pt-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Drag to reorder"
+          className="cursor-grab touch-none active:cursor-grabbing"
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical className="size-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Duplicate field"
+          onClick={duplicate}
+        >
+          <Copy className="size-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Delete field"
+          className="text-destructive hover:text-destructive"
+          onClick={remove}
+        >
+          <Trash2 className="size-4" />
+        </Button>
+      </div>
+      <div className="flex-1">
+        <Comp field={field} update={update} />
+      </div>
+    </div>
+  )
+}
+
 export default function Page() {
   // --- the backbone: a single source of truth for the whole form ---
   const [form, setForm] = useState<FieldInstance[]>([])
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  )
 
   const addField = (type: FieldType) => {
     setForm((prev) => [
@@ -59,14 +146,28 @@ export default function Page() {
   const removeField = (id: string) => {
     setForm((prev) => prev.filter((f) => f.id !== id))
   }
-  const moveField = (id: string, direction: -1 | 1) => {
+  // insert a deep copy right after the original
+  const duplicateField = (id: string) => {
     setForm((prev) => {
       const index = prev.findIndex((f) => f.id === id)
-      const target = index + direction
-      if (index < 0 || target < 0 || target >= prev.length) return prev
+      if (index < 0) return prev
+      const copy: FieldInstance = {
+        ...prev[index],
+        id: crypto.randomUUID(),
+        data: structuredClone(prev[index].data),
+      }
       const next = [...prev]
-      ;[next[index], next[target]] = [next[target], next[index]]
+      next.splice(index + 1, 0, copy)
       return next
+    })
+  }
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    setForm((prev) => {
+      const oldIndex = prev.findIndex((f) => f.id === active.id)
+      const newIndex = prev.findIndex((f) => f.id === over.id)
+      return arrayMove(prev, oldIndex, newIndex)
     })
   }
 
@@ -99,39 +200,26 @@ export default function Page() {
         <ResizableHandle />
         <ResizablePanel defaultSize="50%" minSize="450px">
           <div className="h-full flex-col items-center justify-center gap-4 overflow-auto p-6">
-            {form.map((field, i) => {
-              const Comp = FIELD_COMPONENTS[field.type]
-              return (
-                <div key={field.id} className="flex items-start gap-2 py-2">
-                  {/* TODO: turn into drag & drop ux => objectively better  */}
-                  <div className="flex flex-col gap-1 pt-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      disabled={i === 0}
-                      onClick={() => moveField(field.id, -1)}
-                    >
-                      ⬆️
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      disabled={i === form.length - 1}
-                      onClick={() => moveField(field.id, 1)}
-                    >
-                      ⬇️
-                    </Button>
-                  </div>
-                  <div className="flex-1">
-                    <Comp
-                      field={field}
-                      update={(patch) => updateField(field.id, patch)}
-                      remove={() => removeField(field.id)}
-                    />
-                  </div>
-                </div>
-              )
-            })}
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={form.map((f) => f.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                {form.map((field) => (
+                  <SortableField
+                    key={field.id}
+                    field={field}
+                    update={(patch) => updateField(field.id, patch)}
+                    remove={() => removeField(field.id)}
+                    duplicate={() => duplicateField(field.id)}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
           </div>
         </ResizablePanel>
 

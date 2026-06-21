@@ -1,6 +1,5 @@
 "use client"
 
-import { Button } from "../ui/button"
 import { Card } from "../ui/card"
 import { Field, FieldDescription, FieldError, FieldLabel } from "../ui/field"
 import { Input } from "../ui/input"
@@ -15,17 +14,11 @@ import {
 import { Switch } from "../ui/switch"
 import { FieldFormProps } from "./types"
 
-function FileForm({ field, update, remove }: FieldFormProps) {
+function FileForm({ field, update }: FieldFormProps) {
   const { data } = field
 
   return (
     <Card className="p-4">
-      <div className="flex justify-end">
-        <Button variant="ghost" size="sm" onClick={remove}>
-          ❌
-        </Button>
-      </div>
-
       <Field aria-required>
         <FieldLabel>Label</FieldLabel>
         <Input
