@@ -55,7 +55,7 @@ function FileForm({ field, update, remove }: FieldFormProps) {
           <SelectTrigger>
             <SelectValue placeholder="All" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent position="popper">
             <SelectGroup>
               <SelectItem value="All">All</SelectItem>
               <SelectItem value="PDF">PDF</SelectItem>
@@ -66,7 +66,7 @@ function FileForm({ field, update, remove }: FieldFormProps) {
       </Field>
 
       {/* preview of the large drop-zone the rendered field will show */}
-      <div className="border-muted-foreground/25 text-muted-foreground rounded-lg border-2 border-dashed p-8 text-center text-sm">
+      <div className="rounded-lg border-2 border-dashed border-muted-foreground/25 p-8 text-center text-sm text-muted-foreground">
         {data.placeholder?.trim() || "Drag & drop a file, or click to browse"}
       </div>
 

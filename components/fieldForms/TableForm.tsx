@@ -60,7 +60,12 @@ function TableForm({ field, update, remove }: FieldFormProps) {
       <FieldGroup className="gap-3">
         <FieldTitle>Columns</FieldTitle>
         {columns.map((col, i) => (
-          <Field aria-required key={i} orientation="horizontal" className="px-2">
+          <Field
+            aria-required
+            key={i}
+            orientation="horizontal"
+            className="px-2"
+          >
             <span className="w-full">
               <FieldLabel>Header</FieldLabel>
               <Input
@@ -76,10 +81,10 @@ function TableForm({ field, update, remove }: FieldFormProps) {
                 value={col.type}
                 onValueChange={(value) => updateColumn(i, { type: value })}
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Text" />
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Text" className="w-full" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent position="popper">
                   <SelectGroup>
                     {COLUMN_TYPES.map((t) => (
                       <SelectItem key={t} value={t}>

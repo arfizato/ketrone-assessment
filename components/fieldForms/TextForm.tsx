@@ -55,7 +55,7 @@ function TextForm({ field, update, remove }: FieldFormProps) {
           <SelectTrigger>
             <SelectValue placeholder="None" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent position="popper">
             <SelectGroup>
               <SelectItem value="None">None</SelectItem>
               <SelectItem value="Email">Email</SelectItem>
