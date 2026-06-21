@@ -13,7 +13,7 @@
  *   4. register it in FIELD_COMPONENTS in page.tsx
  */
 
-export type FieldType = "text" | "select" | "radio" | "file" | "list"
+export type FieldType = "text" | "select" | "radio" | "file" | "list" | "table"
 
 export type SelectOption = {
   label: string
@@ -24,6 +24,12 @@ export type SelectOption = {
 export type ListRow = {
   name: string
   percentage: string
+}
+
+/** A column definition for the table field; the filler adds rows at fill time. */
+export type TableColumn = {
+  label: string
+  type: string // "Text" | "Number" | "Date"
 }
 
 /**
@@ -45,6 +51,9 @@ export type FieldData = {
 
   /** dynamic repeatable list fields */
   rows?: ListRow[]
+
+  /** table fields: user-defined columns; the filler adds rows at fill time */
+  columns?: TableColumn[]
 
   /** conditional helper / warning label shown under the field */
   helperLabel?: string
@@ -76,4 +85,5 @@ export const DEFAULT_FIELD_DATA: Record<FieldType, FieldData> = {
   radio: { options: [{ label: "", value: "" }] },
   file: { validation: "All" },
   list: { rows: [{ name: "", percentage: "" }] },
+  table: { columns: [{ label: "", type: "Text" }] },
 }

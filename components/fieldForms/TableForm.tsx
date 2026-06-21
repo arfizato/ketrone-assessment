@@ -1,0 +1,147 @@
+"use client"
+
+import { Button } from "../ui/button"
+import { Card } from "../ui/card"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldTitle,
+} from "../ui/field"
+import { Input } from "../ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select"
+import { Switch } from "../ui/switch"
+import { FieldFormProps, TableColumn } from "./types"
+
+const COLUMN_TYPES = ["Text", "Number", "Date"]
+
+function TableForm({ field, update, remove }: FieldFormProps) {
+  const { data } = field
+  const columns = data.columns ?? []
+
+  // every mutation rewrites the whole columns array back into the backbone
+  const setColumns = (next: TableColumn[]) => update({ columns: next })
+
+  const updateColumn = (index: number, patch: Partial<TableColumn>) =>
+    setColumns(columns.map((c, i) => (i === index ? { ...c, ...patch } : c)))
+
+  const dropColumn = (index: number) =>
+    setColumns(columns.filter((_, i) => i !== index))
+
+  const addColumn = () => setColumns([...columns, { label: "", type: "Text" }])
+
+  return (
+    <Card className="p-4">
+      <div className="flex justify-end">
+        <Button variant="ghost" size="sm" onClick={remove}>
+          ❌
+        </Button>
+      </div>
+
+      <Field aria-required>
+        <FieldLabel>Label</FieldLabel>
+        <Input
+          placeholder="Work experience"
+          value={data.label ?? ""}
+          onChange={(e) => update({ label: e.target.value })}
+        />
+        <FieldError></FieldError>
+      </Field>
+
+      <FieldGroup className="gap-3">
+        <FieldTitle>Columns</FieldTitle>
+        {columns.map((col, i) => (
+          <Field aria-required key={i} orientation="horizontal" className="px-2">
+            <span className="w-full">
+              <FieldLabel>Header</FieldLabel>
+              <Input
+                placeholder="Company"
+                value={col.label}
+                onChange={(e) => updateColumn(i, { label: e.target.value })}
+              />
+            </span>
+
+            <span className="w-full">
+              <FieldLabel>Type</FieldLabel>
+              <Select
+                value={col.type}
+                onValueChange={(value) => updateColumn(i, { type: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Text" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {COLUMN_TYPES.map((t) => (
+                      <SelectItem key={t} value={t}>
+                        {t}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </span>
+            <span>
+              <FieldLabel className="opacity-0">.</FieldLabel>
+              <Button variant="ghost" onClick={() => dropColumn(i)}>
+                ❌
+              </Button>
+            </span>
+            <FieldError></FieldError>
+          </Field>
+        ))}
+        <Button className="mt-2" onClick={addColumn}>
+          ➕
+        </Button>
+      </FieldGroup>
+
+      {/* preview of the table the rendered field will show */}
+      {columns.length > 0 && (
+        <div className="overflow-x-auto rounded-lg border">
+          <table className="w-full text-sm">
+            <thead className="bg-accent">
+              <tr>
+                {columns.map((col, i) => (
+                  <th key={i} className="px-3 py-2 text-left font-medium">
+                    {col.label.trim() || `Column ${i + 1}`}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="text-muted-foreground">
+                {columns.map((col, i) => (
+                  <td key={i} className="px-3 py-2 italic">
+                    {col.type.toLowerCase()}…
+                  </td>
+                ))}
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <Field orientation="horizontal" className="w-full justify-between">
+        <div>
+          <FieldLabel>Required</FieldLabel>
+          <FieldDescription>Must be filled before submission</FieldDescription>
+        </div>
+        <Switch
+          checked={data.required ?? false}
+          onCheckedChange={(checked) => update({ required: checked })}
+        />
+      </Field>
+    </Card>
+  )
+}
+
+export default TableForm

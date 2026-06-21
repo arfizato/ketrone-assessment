@@ -2,6 +2,7 @@
 
 import FileForm from "@/components/fieldForms/FileForm"
 import SelectForm from "@/components/fieldForms/SelectForm"
+import TableForm from "@/components/fieldForms/TableForm"
 import TextForm from "@/components/fieldForms/TextForm"
 import {
   DEFAULT_FIELD_DATA,
@@ -32,6 +33,7 @@ const FIELD_PALETTE: PaletteItem[] = [
   { name: "Radio", type: "radio" },
   { name: "File", type: "file" },
   { name: "List", type: "list" },
+  { name: "Table", type: "table" },
 ]
 function PlaceholderForm({ field, remove }: FieldFormProps) {
   return (
@@ -49,6 +51,7 @@ const FIELD_COMPONENTS: Record<FieldType, ComponentType<FieldFormProps>> = {
   radio: PlaceholderForm,
   file: FileForm,
   list: PlaceholderForm,
+  table: TableForm,
 }
 
 export default function Page() {
