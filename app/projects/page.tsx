@@ -35,21 +35,33 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { Copy, GripVertical, Trash2 } from "lucide-react"
+import {
+  Copy,
+  GripVertical,
+  LayoutTemplate,
+  List,
+  Plus,
+  Table,
+  Trash2,
+  Type,
+  Upload,
+  type LucideIcon,
+} from "lucide-react"
 import { ComponentType, useState } from "react"
 
 type PaletteItem = {
   name: string
   type: FieldType
-  desc?: string
+  desc: string
+  icon: LucideIcon
 }
 
 /** The left-rail palette of field types the user can add. */
 const FIELD_PALETTE: PaletteItem[] = [
-  { name: "Text", type: "text" },
-  { name: "Select", type: "select", desc: "select something man" },
-  { name: "File", type: "file" },
-  { name: "Table", type: "table" },
+  { name: "Text", type: "text", icon: Type, desc: "Single-line input" },
+  { name: "Select", type: "select", icon: List, desc: "Dropdown of options" },
+  { name: "File", type: "file", icon: Upload, desc: "File upload" },
+  { name: "Table", type: "table", icon: Table, desc: "Editable grid" },
 ]
 const FIELD_COMPONENTS: Record<FieldType, ComponentType<FieldFormProps>> = {
   text: TextForm,
@@ -179,47 +191,79 @@ export default function Page() {
         className="w-full rounded-lg border"
       >
         {/* TODO: use drawer for responsive on small screens */}
-        <ResizablePanel defaultSize="15%" minSize="150px">
-          <div className="h-[200px] flex-col items-center justify-center gap-6 p-6">
-            {FIELD_PALETTE.map((item) => (
-              <button
-                key={item.type}
-                className="my-4 bg-zinc-600"
-                onClick={() => addField(item.type)}
-              >
-                <span>{item.name}</span>
-                {item.desc && (
-                  <span className="font-mono italic">{item.desc}</span>
-                )}
-              </button>
-            ))}
+        <ResizablePanel defaultSize="15%" minSize="200px">
+          <div className="bg-muted/30 flex h-full flex-col">
+            <div className="border-b px-4 py-3">
+              <h2 className="text-sm font-semibold tracking-tight">
+                Components
+              </h2>
+              <p className="text-muted-foreground text-xs">
+                Click to add a field
+              </p>
+            </div>
+            <div className="flex flex-col gap-1.5 overflow-auto p-3">
+              {FIELD_PALETTE.map((item) => (
+                <button
+                  key={item.type}
+                  onClick={() => addField(item.type)}
+                  className="group bg-card hover:border-border hover:bg-accent focus-visible:ring-ring flex items-center gap-3 rounded-lg border border-transparent p-2.5 text-left transition-colors focus-visible:ring-2 focus-visible:outline-none"
+                >
+                  <span className="bg-background text-muted-foreground group-hover:border-primary/40 group-hover:text-foreground flex size-9 shrink-0 items-center justify-center rounded-md border transition-colors">
+                    <item.icon className="size-4" />
+                  </span>
+                  <span className="flex min-w-0 flex-col">
+                    <span className="text-sm leading-none font-medium">
+                      {item.name}
+                    </span>
+                    <span className="text-muted-foreground mt-1 truncate text-xs">
+                      {item.desc}
+                    </span>
+                  </span>
+                  <Plus className="text-muted-foreground/0 group-hover:text-muted-foreground ml-auto size-4 shrink-0 transition-colors" />
+                </button>
+              ))}
+            </div>
           </div>
         </ResizablePanel>
 
         {/* TODO: use tabs for responsive on medium screens */}
         <ResizableHandle />
         <ResizablePanel defaultSize="50%" minSize="450px">
-          <div className="h-full flex-col items-center justify-center gap-4 overflow-auto p-6">
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-            >
-              <SortableContext
-                items={form.map((f) => f.id)}
-                strategy={verticalListSortingStrategy}
+          <div className="h-full overflow-auto p-6">
+            {form.length === 0 ? (
+              <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
+                <div className="bg-muted text-muted-foreground flex size-12 items-center justify-center rounded-full">
+                  <LayoutTemplate className="size-6" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">No fields yet</p>
+                  <p className="text-muted-foreground mx-auto max-w-xs text-sm">
+                    Pick a component from the left to start building your form.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
               >
-                {form.map((field) => (
-                  <SortableField
-                    key={field.id}
-                    field={field}
-                    update={(patch) => updateField(field.id, patch)}
-                    remove={() => removeField(field.id)}
-                    duplicate={() => duplicateField(field.id)}
-                  />
-                ))}
-              </SortableContext>
-            </DndContext>
+                <SortableContext
+                  items={form.map((f) => f.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {form.map((field) => (
+                    <SortableField
+                      key={field.id}
+                      field={field}
+                      update={(patch) => updateField(field.id, patch)}
+                      remove={() => removeField(field.id)}
+                      duplicate={() => duplicateField(field.id)}
+                    />
+                  ))}
+                </SortableContext>
+              </DndContext>
+            )}
           </div>
         </ResizablePanel>
 
