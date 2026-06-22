@@ -4,6 +4,7 @@ import FileForm from "@/components/fieldForms/FileForm"
 import SelectForm from "@/components/fieldForms/SelectForm"
 import TableForm from "@/components/fieldForms/TableForm"
 import TextForm from "@/components/fieldForms/TextForm"
+import FormPreview from "@/components/FormPreview"
 import {
   DEFAULT_FIELD_DATA,
   FieldData,
@@ -36,6 +37,7 @@ import {
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import {
+  Braces,
   Copy,
   GripVertical,
   LayoutTemplate,
@@ -134,6 +136,8 @@ function SortableField({
 export default function Page() {
   // --- the backbone: a single source of truth for the whole form ---
   const [form, setForm] = useState<FieldInstance[]>([])
+  // right panel: rendered preview by default, raw JSON state for debugging
+  const [showJson, setShowJson] = useState(false)
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
@@ -267,14 +271,33 @@ export default function Page() {
           </div>
         </ResizablePanel>
 
-        {/* live view of the shared backbone state */}
+        {/* live preview of the form (toggle to raw state for debugging) */}
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize="35%" minSize="300px">
-          <div className="h-full overflow-auto p-6">
-            <span className="font-semibold">Form state</span>
-            <pre className="mt-4 rounded bg-accent p-3 text-xs">
-              {JSON.stringify(form, null, 2)}
-            </pre>
+          <div className="flex h-full flex-col">
+            <div className="flex items-center justify-between border-b px-4 py-3">
+              <h2 className="text-sm font-semibold tracking-tight">
+                {showJson ? "Form state" : "Preview"}
+              </h2>
+              <Button
+                variant={showJson ? "secondary" : "ghost"}
+                size="icon"
+                aria-label="Toggle debug state"
+                aria-pressed={showJson}
+                onClick={() => setShowJson((v) => !v)}
+              >
+                <Braces className="size-4" />
+              </Button>
+            </div>
+            <div className="flex-1 overflow-auto p-4">
+              {showJson ? (
+                <pre className="bg-accent rounded p-3 text-xs">
+                  {JSON.stringify(form, null, 2)}
+                </pre>
+              ) : (
+                <FormPreview fields={form} />
+              )}
+            </div>
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>
