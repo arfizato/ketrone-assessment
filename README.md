@@ -19,3 +19,8 @@ To use the components in your app, import them as follows:
 ```tsx
 import { Button } from "@/components/ui/button";
 ```
+
+# todo:
+
+- add icons to fieldforms to make them easily recognizable
+- add tooltips to coponentns sidebar to allow users to read the desc when the panel is too small
