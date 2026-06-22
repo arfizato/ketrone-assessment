@@ -1,6 +1,7 @@
 "use client"
 
 import FileForm from "@/components/fieldForms/FileForm"
+import RadioForm from "@/components/fieldForms/RadioForm"
 import SelectForm from "@/components/fieldForms/SelectForm"
 import TableForm from "@/components/fieldForms/TableForm"
 import TextForm from "@/components/fieldForms/TextForm"
@@ -38,6 +39,7 @@ import {
 import { CSS } from "@dnd-kit/utilities"
 import {
   Braces,
+  CircleDot,
   Copy,
   GripVertical,
   LayoutTemplate,
@@ -62,12 +64,14 @@ type PaletteItem = {
 const FIELD_PALETTE: PaletteItem[] = [
   { name: "Text", type: "text", icon: Type, desc: "Single-line input" },
   { name: "Select", type: "select", icon: List, desc: "Dropdown of options" },
+  { name: "Radio", type: "radio", icon: CircleDot, desc: "Single choice from a list" },
   { name: "File", type: "file", icon: Upload, desc: "File upload" },
   { name: "Table", type: "table", icon: Table, desc: "Editable grid" },
 ]
 const FIELD_COMPONENTS: Record<FieldType, ComponentType<FieldFormProps>> = {
   text: TextForm,
   select: SelectForm,
+  radio: RadioForm,
   file: FileForm,
   table: TableForm,
 }

@@ -13,7 +13,7 @@
  *   4. register it in FIELD_COMPONENTS in page.tsx
  */
 
-export type FieldType = "text" | "select" | "file" | "table"
+export type FieldType = "text" | "select" | "file" | "table" | "radio"
 
 export type SelectOption = {
   label: string
@@ -40,7 +40,7 @@ export type FieldData = {
    */
   validation?: string
 
-  /** select fields */
+  /** select & radio fields */
   options?: SelectOption[]
 
   /** table fields: user-defined columns; the filler adds rows at fill time */
@@ -74,4 +74,5 @@ export const DEFAULT_FIELD_DATA: Record<FieldType, FieldData> = {
   select: { options: [{ label: "", value: "" }] },
   file: { validation: "All" },
   table: { columns: [{ label: "", type: "Text" }] },
+  radio: { options: [{ label: "", value: "" }] },
 }

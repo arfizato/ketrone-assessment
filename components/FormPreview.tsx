@@ -6,6 +6,7 @@ import { FieldInstance } from "./fieldForms/types"
 import { Button } from "./ui/button"
 import { Field, FieldLabel } from "./ui/field"
 import { Input } from "./ui/input"
+import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
 import {
   Select,
   SelectContent,
@@ -152,6 +153,34 @@ function PreviewField({ field }: { field: FieldInstance }) {
               </SelectGroup>
             </SelectContent>
           </Select>
+        </Field>
+      )
+    }
+
+    case "radio": {
+      const options = (data.options ?? []).filter(
+        (o) => o.value.trim() && o.label.trim(),
+      )
+      return (
+        <Field>
+          <PreviewLabel label={data.label} required={data.required} />
+          {options.length === 0 ? (
+            <p className="text-muted-foreground text-sm">No options</p>
+          ) : (
+            <RadioGroup>
+              {options.map((o, i) => {
+                const id = `${field.id}-${i}`
+                return (
+                  <div key={i} className="flex items-center gap-2">
+                    <RadioGroupItem value={o.value} id={id} />
+                    <FieldLabel htmlFor={id} className="text-foreground font-normal">
+                      {o.label}
+                    </FieldLabel>
+                  </div>
+                )
+              })}
+            </RadioGroup>
+          )}
         </Field>
       )
     }
