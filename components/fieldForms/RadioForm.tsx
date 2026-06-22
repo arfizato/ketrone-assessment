@@ -12,6 +12,7 @@ import {
 } from "../ui/field"
 import { Input } from "../ui/input"
 import { Switch } from "../ui/switch"
+import { FieldFormHeader } from "./FieldFormHeader"
 import { FieldFormProps, SelectOption } from "./types"
 import { Plus, X } from "lucide-react"
 
@@ -31,6 +32,7 @@ function RadioForm({ field, update }: FieldFormProps) {
 
   return (
     <Card className="p-4">
+      <FieldFormHeader type={field.type} />
       <Field aria-required>
         <FieldLabel>Label</FieldLabel>
         <Input

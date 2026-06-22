@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "../ui/select"
 import { Switch } from "../ui/switch"
+import { FieldFormHeader } from "./FieldFormHeader"
 import { FieldFormProps } from "./types"
 
 function FileForm({ field, update }: FieldFormProps) {
@@ -19,6 +20,7 @@ function FileForm({ field, update }: FieldFormProps) {
 
   return (
     <Card className="p-4">
+      <FieldFormHeader type={field.type} />
       <Field aria-required>
         <FieldLabel>Label</FieldLabel>
         <Input
