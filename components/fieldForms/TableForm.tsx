@@ -23,7 +23,7 @@ import { Switch } from "../ui/switch"
 import { FieldFormProps, TableColumn } from "./types"
 import { Plus, X } from "lucide-react"
 
-const COLUMN_TYPES = ["Text", "Number", "Date"]
+const COLUMN_TYPES = ["Text", "Number", "Currency", "Percent", "Date"]
 
 function TableForm({ field, update }: FieldFormProps) {
   const { data } = field
@@ -116,7 +116,7 @@ function TableForm({ field, update }: FieldFormProps) {
       </FieldGroup>
 
       {/* preview of the table the rendered field will show */}
-      {columns.length > 0 && (
+      {/* {columns.length > 0 && (
         <div className="overflow-x-auto rounded-lg border">
           <table className="w-full text-sm">
             <thead className="bg-accent">
@@ -139,7 +139,7 @@ function TableForm({ field, update }: FieldFormProps) {
             </tbody>
           </table>
         </div>
-      )}
+      )} */}
 
       <Field orientation="horizontal" className="w-full justify-between">
         <div>

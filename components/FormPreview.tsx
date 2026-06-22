@@ -6,6 +6,7 @@ import { FieldInstance } from "./fieldForms/types"
 import { Button } from "./ui/button"
 import { Field, FieldLabel } from "./ui/field"
 import { Input } from "./ui/input"
+import { InputGroup, InputGroupAddon, InputGroupInput } from "./ui/input-group"
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
 import {
   Select,
@@ -47,11 +48,11 @@ function PreviewLabel({
 
 /** Editable, row-addable preview of a table field. */
 function TablePreview({ field }: { field: FieldInstance }) {
-  const columns = (field.data.columns ?? []).filter((c) => c.label.trim())
+  const columns = field.data.columns ?? [] //.filter((c) => c.label.trim())
   const [rows, setRows] = useState(1)
 
   if (columns.length === 0) {
-    return <p className="text-muted-foreground text-sm">No columns defined</p>
+    return <p className="text-sm text-muted-foreground">No columns defined</p>
   }
 
   return (
@@ -62,7 +63,7 @@ function TablePreview({ field }: { field: FieldInstance }) {
             <tr>
               {columns.map((col, i) => (
                 <th key={i} className="px-3 py-2 text-left font-medium">
-                  {col.label}
+                  {col.label ? col.label : `column ${i + 1}`}
                 </th>
               ))}
               <th className="w-10" />
@@ -71,20 +72,47 @@ function TablePreview({ field }: { field: FieldInstance }) {
           <tbody>
             {Array.from({ length: rows }).map((_, r) => (
               <tr key={r} className="border-t">
-                {columns.map((col, c) => (
-                  <td key={c} className="p-1">
-                    <Input
-                      type={
-                        col.type === "Number"
-                          ? "number"
-                          : col.type === "Date"
-                            ? "date"
-                            : "text"
-                      }
-                      className="h-8 border-0 shadow-none focus-visible:ring-1"
-                    />
-                  </td>
-                ))}
+                {columns.map((col, c) => {
+                  const numeric =
+                    col.type === "Number" ||
+                    col.type === "Currency" ||
+                    col.type === "Percent"
+                  const prefix = col.type === "Currency" ? "$" : undefined
+                  const suffix = col.type === "Percent" ? "%" : undefined
+                  const inputType = numeric
+                    ? "number"
+                    : col.type === "Date"
+                      ? "date"
+                      : "text"
+                  return (
+                    <td key={c} className="p-1">
+                      {prefix || suffix ? (
+                        <InputGroup className="h-8 border-0 shadow-none">
+                          {prefix && (
+                            <InputGroupAddon align="inline-start">
+                              {prefix}
+                            </InputGroupAddon>
+                          )}
+                          <InputGroupInput
+                            type="number"
+                            min={col.type === "Percent" ? 0 : undefined}
+                            max={col.type === "Percent" ? 100 : undefined}
+                          />
+                          {suffix && (
+                            <InputGroupAddon align="inline-end">
+                              {suffix}
+                            </InputGroupAddon>
+                          )}
+                        </InputGroup>
+                      ) : (
+                        <Input
+                          type={inputType}
+                          className="h-8 border-0 shadow-none focus-visible:ring-1"
+                        />
+                      )}
+                    </td>
+                  )
+                })}
                 <td className="p-1 text-center">
                   <Button
                     variant="ghost"
@@ -126,7 +154,7 @@ function PreviewField({ field }: { field: FieldInstance }) {
 
     case "select": {
       const options = (data.options ?? []).filter(
-        (o) => o.value.trim() && o.label.trim(),
+        (o) => o.value.trim() && o.label.trim()
       )
       return (
         <Field>
@@ -140,7 +168,7 @@ function PreviewField({ field }: { field: FieldInstance }) {
             <SelectContent position="popper">
               <SelectGroup>
                 {options.length === 0 ? (
-                  <div className="text-muted-foreground px-2 py-1.5 text-sm">
+                  <div className="px-2 py-1.5 text-sm text-muted-foreground">
                     No options
                   </div>
                 ) : (
@@ -159,13 +187,13 @@ function PreviewField({ field }: { field: FieldInstance }) {
 
     case "radio": {
       const options = (data.options ?? []).filter(
-        (o) => o.value.trim() && o.label.trim(),
+        (o) => o.value.trim() && o.label.trim()
       )
       return (
         <Field>
           <PreviewLabel label={data.label} required={data.required} />
           {options.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No options</p>
+            <p className="text-sm text-muted-foreground">No options</p>
           ) : (
             <RadioGroup>
               {options.map((o, i) => {
@@ -173,7 +201,10 @@ function PreviewField({ field }: { field: FieldInstance }) {
                 return (
                   <div key={i} className="flex items-center gap-2">
                     <RadioGroupItem value={o.value} id={id} />
-                    <FieldLabel htmlFor={id} className="text-foreground font-normal">
+                    <FieldLabel
+                      htmlFor={id}
+                      className="font-normal text-foreground"
+                    >
                       {o.label}
                     </FieldLabel>
                   </div>
@@ -189,9 +220,9 @@ function PreviewField({ field }: { field: FieldInstance }) {
       return (
         <Field>
           <PreviewLabel label={data.label} required={data.required} />
-          <label className="border-muted-foreground/25 hover:border-muted-foreground/50 hover:bg-accent/50 flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 border-dashed p-6 text-center transition-colors">
-            <Upload className="text-muted-foreground size-5" />
-            <span className="text-muted-foreground text-sm">
+          <label className="flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 border-dashed border-muted-foreground/25 p-6 text-center transition-colors hover:border-muted-foreground/50 hover:bg-accent/50">
+            <Upload className="size-5 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">
               {data.placeholder?.trim() ||
                 "Drag & drop a file, or click to browse"}
             </span>
@@ -217,7 +248,7 @@ function PreviewField({ field }: { field: FieldInstance }) {
 export default function FormPreview({ fields }: { fields: FieldInstance[] }) {
   if (fields.length === 0) {
     return (
-      <p className="text-muted-foreground text-sm">
+      <p className="text-sm text-muted-foreground">
         Add a field to see the preview.
       </p>
     )
