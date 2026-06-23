@@ -24,7 +24,6 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { useBreakpoint } from "@/hooks/use-breakpoint"
 import { DEFAULT_THEME, FormTheme } from "@/lib/theme"
 import { arrayMove } from "@dnd-kit/sortable"
@@ -33,12 +32,10 @@ import {
   ArrowRight,
   Eye,
   Hammer,
-  Moon,
   PanelBottom,
   SlidersHorizontal,
-  Sun,
 } from "lucide-react"
-import { useState } from "react"
+import { useState, useSyncExternalStore } from "react"
 
 type View = "build" | "preview"
 type Step = "content" | "design"
@@ -74,28 +71,21 @@ function ViewTabs({
   )
 }
 
-/** Light/dark switch for the design preview (independent of the saved default). */
-function PreviewModeToggle({
-  value,
-  onValueChange,
-}: {
-  value: "light" | "dark"
-  onValueChange: (v: "light" | "dark") => void
-}) {
-  return (
-    <ToggleGroup
-      type="single"
-      variant="outline"
-      value={value}
-      onValueChange={(v) => v && onValueChange(v as "light" | "dark")}
-    >
-      <ToggleGroupItem value="light" aria-label="Preview light">
-        <Sun className="size-4" />
-      </ToggleGroupItem>
-      <ToggleGroupItem value="dark" aria-label="Preview dark">
-        <Moon className="size-4" />
-      </ToggleGroupItem>
-    </ToggleGroup>
+/** Subscribe to the OS color-scheme so a "system" appearance can follow it. */
+const prefersDark = {
+  subscribe(cb: () => void) {
+    const mql = window.matchMedia("(prefers-color-scheme: dark)")
+    mql.addEventListener("change", cb)
+    return () => mql.removeEventListener("change", cb)
+  },
+  snapshot: () => window.matchMedia("(prefers-color-scheme: dark)").matches,
+}
+
+function useSystemDark() {
+  return useSyncExternalStore(
+    prefersDark.subscribe,
+    prefersDark.snapshot,
+    () => false
   )
 }
 
@@ -106,8 +96,6 @@ export default function Page() {
   const [theme, setTheme] = useState<FormTheme>(DEFAULT_THEME)
   // top-level step: build the content, then design it
   const [step, setStep] = useState<Step>("content")
-  // design-only: preview light vs dark, regardless of the saved default
-  const [previewMode, setPreviewMode] = useState<"light" | "dark">("light")
   // below lg, the design controls open from a drawer over the preview
   const [designDrawerOpen, setDesignDrawerOpen] = useState(false)
   // below lg, the preview lives behind a toggle instead of its own panel
@@ -117,6 +105,18 @@ export default function Page() {
 
   // undefined until mounted -> render the lg layout on the server / first paint
   const bp = useBreakpoint() ?? "lg"
+
+  // the preview's light/dark follows the saved appearance: light/dark force it,
+  // "system" follows the OS — exactly what the embed does at runtime
+  const systemDark = useSystemDark()
+  const previewMode: "light" | "dark" =
+    theme.appearance === "dark"
+      ? "dark"
+      : theme.appearance === "light"
+        ? "light"
+        : systemDark
+          ? "dark"
+          : "light"
 
   const addField = (type: FieldType) => {
     setForm((prev) => [
@@ -161,6 +161,11 @@ export default function Page() {
   const updateTheme = (patch: Partial<FormTheme>) =>
     setTheme((t) => ({ ...t, ...patch }))
 
+  // applying a preset keeps the user's chosen appearance (light/dark/system)
+  // instead of snapping back to the preset's default
+  const applyPreset = (preset: FormTheme) =>
+    setTheme((t) => ({ ...preset, appearance: t.appearance }))
+
   const builder = (
     <FormBuilder
       fields={form}
@@ -184,7 +189,7 @@ export default function Page() {
   // The left side swaps between the build tools (Content) and the theme
   // controls (Design); the preview panel is shared by both steps.
   const designTools = (
-    <DesignPanel theme={theme} onChange={updateTheme} onApplyPreset={setTheme} />
+    <DesignPanel theme={theme} onChange={updateTheme} onApplyPreset={applyPreset} />
   )
 
   let main: React.ReactNode
@@ -243,13 +248,8 @@ export default function Page() {
       <header className="grid h-14 shrink-0 grid-cols-[1fr_auto_1fr] items-center border-b bg-accent px-3">
         <span className="text-sm font-medium">nav</span>
         <div className="flex justify-center">
-          {step === "design" ? (
-            <PreviewModeToggle
-              value={previewMode}
-              onValueChange={setPreviewMode}
-            />
-          ) : (
-            bp === "md" && <ViewTabs value={view} onValueChange={setView} />
+          {step === "content" && bp === "md" && (
+            <ViewTabs value={view} onValueChange={setView} />
           )}
         </div>
         <div className="flex justify-end">
@@ -332,7 +332,7 @@ export default function Page() {
             <DesignPanel
               theme={theme}
               onChange={updateTheme}
-              onApplyPreset={setTheme}
+              onApplyPreset={applyPreset}
               className="h-auto max-h-[70vh] overflow-auto"
             />
           </DrawerContent>
