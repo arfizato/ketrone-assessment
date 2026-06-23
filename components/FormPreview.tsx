@@ -2,11 +2,10 @@
 
 import { Plus, Upload, X } from "lucide-react"
 import { useState } from "react"
+import { FieldControl, InputVariant } from "./fieldForms/FieldControl"
 import { FieldInstance } from "./fieldForms/types"
 import { Button } from "./ui/button"
 import { Field, FieldLabel } from "./ui/field"
-import { Input } from "./ui/input"
-import { InputGroup, InputGroupAddon, InputGroupInput } from "./ui/input-group"
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
 import {
   Select,
@@ -17,11 +16,23 @@ import {
   SelectValue,
 } from "./ui/select"
 
-/** text-field validation -> native input type */
-const INPUT_TYPES: Record<string, string> = {
+/** text-field validation value -> rendered input variant */
+const VALIDATION_VARIANT: Record<string, InputVariant> = {
   Email: "email",
   URL: "url",
   Number: "number",
+  Currency: "currency",
+  Percent: "percent",
+  Date: "date",
+}
+
+/** table column type -> rendered input variant */
+const COLUMN_VARIANT: Record<string, InputVariant> = {
+  Text: "text",
+  Number: "number",
+  Currency: "currency",
+  Percent: "percent",
+  Date: "date",
 }
 
 /** file-field validation -> native accept attribute */
@@ -72,47 +83,14 @@ function TablePreview({ field }: { field: FieldInstance }) {
           <tbody>
             {Array.from({ length: rows }).map((_, r) => (
               <tr key={r} className="border-t">
-                {columns.map((col, c) => {
-                  const numeric =
-                    col.type === "Number" ||
-                    col.type === "Currency" ||
-                    col.type === "Percent"
-                  const prefix = col.type === "Currency" ? "$" : undefined
-                  const suffix = col.type === "Percent" ? "%" : undefined
-                  const inputType = numeric
-                    ? "number"
-                    : col.type === "Date"
-                      ? "date"
-                      : "text"
-                  return (
-                    <td key={c} className="p-1">
-                      {prefix || suffix ? (
-                        <InputGroup className="h-8 border-0 shadow-none">
-                          {prefix && (
-                            <InputGroupAddon align="inline-start">
-                              {prefix}
-                            </InputGroupAddon>
-                          )}
-                          <InputGroupInput
-                            type="number"
-                            min={col.type === "Percent" ? 0 : undefined}
-                            max={col.type === "Percent" ? 100 : undefined}
-                          />
-                          {suffix && (
-                            <InputGroupAddon align="inline-end">
-                              {suffix}
-                            </InputGroupAddon>
-                          )}
-                        </InputGroup>
-                      ) : (
-                        <Input
-                          type={inputType}
-                          className="h-8 border-0 shadow-none focus-visible:ring-1"
-                        />
-                      )}
-                    </td>
-                  )
-                })}
+                {columns.map((col, c) => (
+                  <td key={c} className="p-1">
+                    <FieldControl
+                      variant={COLUMN_VARIANT[col.type] ?? "text"}
+                      className="h-8 border-0 shadow-none focus-visible:ring-1"
+                    />
+                  </td>
+                ))}
                 <td className="p-1 text-center">
                   <Button
                     variant="ghost"
@@ -145,8 +123,8 @@ function PreviewField({ field }: { field: FieldInstance }) {
       return (
         <Field>
           <PreviewLabel label={data.label} required={data.required} />
-          <Input
-            type={INPUT_TYPES[data.validation ?? ""] ?? "text"}
+          <FieldControl
+            variant={VALIDATION_VARIANT[data.validation ?? ""] ?? "text"}
             placeholder={data.placeholder}
           />
         </Field>

@@ -41,7 +41,7 @@ function TextForm({ field, update }: FieldFormProps) {
         <FieldError></FieldError>
       </Field>
 
-      <Field className="w-full max-w-xs">
+      <Field className="w-full max-w-none">
         <FieldLabel>Validation</FieldLabel>
         <Select
           value={data.validation ?? "None"}
@@ -56,6 +56,9 @@ function TextForm({ field, update }: FieldFormProps) {
               <SelectItem value="Email">Email</SelectItem>
               <SelectItem value="URL">URL</SelectItem>
               <SelectItem value="Number">Number</SelectItem>
+              <SelectItem value="Currency">Currency</SelectItem>
+              <SelectItem value="Percent">Percent</SelectItem>
+              <SelectItem value="Date">Date</SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
