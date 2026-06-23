@@ -1,7 +1,7 @@
 "use client"
 
 import { Plus, Upload, X } from "lucide-react"
-import { useState } from "react"
+import { CSSProperties, useState } from "react"
 import { FieldControl, InputVariant } from "./fieldForms/FieldControl"
 import { FieldInstance } from "./fieldForms/types"
 import { Button } from "./ui/button"
@@ -115,7 +115,14 @@ function TablePreview({ field }: { field: FieldInstance }) {
   )
 }
 
-function PreviewField({ field }: { field: FieldInstance }) {
+function PreviewField({
+  field,
+  themeVars,
+}: {
+  field: FieldInstance
+  /** resolved theme vars, applied to the portaled Select menu so it stays themed */
+  themeVars?: CSSProperties
+}) {
   const { data } = field
 
   switch (field.type) {
@@ -143,7 +150,7 @@ function PreviewField({ field }: { field: FieldInstance }) {
                 placeholder={data.placeholder?.trim() || "Select an option"}
               />
             </SelectTrigger>
-            <SelectContent position="popper">
+            <SelectContent position="popper" style={themeVars}>
               <SelectGroup>
                 {options.length === 0 ? (
                   <div className="px-2 py-1.5 text-sm text-muted-foreground">
@@ -223,7 +230,13 @@ function PreviewField({ field }: { field: FieldInstance }) {
   }
 }
 
-export default function FormPreview({ fields }: { fields: FieldInstance[] }) {
+export default function FormPreview({
+  fields,
+  themeVars,
+}: {
+  fields: FieldInstance[]
+  themeVars?: CSSProperties
+}) {
   if (fields.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">
@@ -238,7 +251,7 @@ export default function FormPreview({ fields }: { fields: FieldInstance[] }) {
       onSubmit={(e) => e.preventDefault()}
     >
       {fields.map((field) => (
-        <PreviewField key={field.id} field={field} />
+        <PreviewField key={field.id} field={field} themeVars={themeVars} />
       ))}
       <Button type="submit" className="w-full">
         Submit

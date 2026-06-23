@@ -13,6 +13,43 @@ import {
   FormTheme,
   PRESETS,
 } from "@/lib/theme"
+import { useState } from "react"
+
+const HEX = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/
+
+/**
+ * Accent hex field with client-side validation. Keeps a local draft so the user
+ * can type freely; only commits to the theme when the value is a valid hex, and
+ * flags an invalid draft. Re-syncs when the value changes elsewhere (swatch /
+ * color picker / preset) using the "adjust state during render" pattern.
+ */
+function AccentHexInput({
+  value,
+  onChange,
+}: {
+  value: string
+  onChange: (v: string) => void
+}) {
+  const [draft, setDraft] = useState(value)
+  const [last, setLast] = useState(value)
+  if (value !== last) {
+    setLast(value)
+    setDraft(value)
+  }
+  const valid = HEX.test(draft)
+  return (
+    <Input
+      value={draft}
+      aria-invalid={!valid}
+      spellCheck={false}
+      className="font-mono"
+      onChange={(e) => {
+        setDraft(e.target.value)
+        if (HEX.test(e.target.value)) onChange(e.target.value)
+      }}
+    />
+  )
+}
 
 function Section({
   label,
@@ -36,10 +73,12 @@ function Segmented<T extends string>({
   value,
   onChange,
   options,
+  disabled,
 }: {
   value: T
   onChange: (v: T) => void
   options: { value: T; label: string }[]
+  disabled?: boolean
 }) {
   return (
     <ToggleGroup
@@ -47,6 +86,7 @@ function Segmented<T extends string>({
       variant="outline"
       value={value}
       onValueChange={(v) => v && onChange(v as T)}
+      disabled={disabled}
       className="w-full"
     >
       {options.map((o) => (
@@ -126,10 +166,9 @@ export default function DesignPanel({
             onChange={(e) => onChange({ accent: e.target.value })}
             className="size-9 shrink-0 cursor-pointer rounded-md border bg-transparent p-0.5"
           />
-          <Input
+          <AccentHexInput
             value={theme.accent}
-            onChange={(e) => onChange({ accent: e.target.value })}
-            className="font-mono"
+            onChange={(accent) => onChange({ accent })}
           />
         </div>
         <div className="mt-2 flex flex-wrap gap-1.5">
@@ -206,19 +245,6 @@ export default function DesignPanel({
         />
       </Section>
 
-      <Section label="Shadow">
-        <Segmented
-          value={theme.shadow}
-          onChange={(shadow) => onChange({ shadow })}
-          options={[
-            { value: "none", label: "None" },
-            { value: "subtle", label: "Subtle" },
-            { value: "medium", label: "Medium" },
-            { value: "strong", label: "Strong" },
-          ]}
-        />
-      </Section>
-
       <Section label="Container">
         <Segmented
           value={theme.container}
@@ -228,6 +254,25 @@ export default function DesignPanel({
             { value: "flat", label: "Flat" },
           ]}
         />
+      </Section>
+
+      <Section label="Shadow">
+        <Segmented
+          value={theme.shadow}
+          onChange={(shadow) => onChange({ shadow })}
+          disabled={theme.container === "flat"}
+          options={[
+            { value: "none", label: "None" },
+            { value: "subtle", label: "Subtle" },
+            { value: "medium", label: "Medium" },
+            { value: "strong", label: "Strong" },
+          ]}
+        />
+        {theme.container === "flat" && (
+          <p className="text-xs text-muted-foreground">
+            Shadow applies to the card container.
+          </p>
+        )}
       </Section>
 
       <Section label="Default appearance">

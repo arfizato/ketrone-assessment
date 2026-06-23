@@ -57,14 +57,13 @@ export default function ThemedPreview({
         data-field-style={theme.fieldStyle}
         data-container={theme.container}
         data-density={theme.density}
-        data-shadow={theme.shadow}
       >
         {fields.length === 0 && (
           <p className="mb-4 text-center text-xs text-muted-foreground">
             Sample form — add fields in Content to theme your own.
           </p>
         )}
-        <FormPreview fields={shown} />
+        <FormPreview fields={shown} themeVars={vars as CSSProperties} />
       </div>
     </div>
   )

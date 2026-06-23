@@ -158,6 +158,7 @@
   gap: var(--field-gap);
 }
 .themed-form [data-slot="input"],
+.themed-form [data-slot="input-group"],
 .themed-form [data-slot="select-trigger"] {
   height: var(--control-height);
 }
@@ -177,12 +178,14 @@
 
 /* field style — filled: muted background, no border */
 .themed-form[data-field-style="filled"] [data-slot="input"],
+.themed-form[data-field-style="filled"] [data-slot="input-group"],
 .themed-form[data-field-style="filled"] [data-slot="select-trigger"] {
   background: var(--muted);
   border-color: transparent;
 }
 /* field style — underlined: bottom border only, square, flush */
 .themed-form[data-field-style="underlined"] [data-slot="input"],
+.themed-form[data-field-style="underlined"] [data-slot="input-group"],
 .themed-form[data-field-style="underlined"] [data-slot="select-trigger"] {
   border-width: 0 0 1px 0;
   border-radius: 0;
