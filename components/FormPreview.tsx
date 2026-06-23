@@ -233,7 +233,10 @@ export default function FormPreview({ fields }: { fields: FieldInstance[] }) {
   }
 
   return (
-    <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+    <form
+      className="flex flex-col gap-5"
+      onSubmit={(e) => e.preventDefault()}
+    >
       {fields.map((field) => (
         <PreviewField key={field.id} field={field} />
       ))}

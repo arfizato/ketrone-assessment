@@ -1,22 +1,28 @@
 "use client"
 
-import FormPreview from "@/components/FormPreview"
+import ThemedPreview from "@/components/design/ThemedPreview"
 import { FieldInstance } from "@/components/fieldForms/types"
 import { Button } from "@/components/ui/button"
+import { FormTheme } from "@/lib/theme"
 import { cn } from "@/lib/utils"
 import { Braces } from "lucide-react"
 import { useState } from "react"
 
 /**
- * Live preview of the form, with a header toggle to inspect the raw field
- * state as JSON for debugging. Owns only its local view toggle; the field
- * data is passed in.
+ * Live preview of the form, themed with the current FormTheme, plus a header
+ * toggle to inspect the raw field state as JSON for debugging. Owns only its
+ * local view toggle; the fields, theme, and preview mode are passed in. The
+ * same panel is shown while building (Content) and while theming (Design).
  */
 export default function PreviewPanel({
   fields,
+  theme,
+  mode = "light",
   className,
 }: {
   fields: FieldInstance[]
+  theme: FormTheme
+  mode?: "light" | "dark"
   className?: string
 }) {
   const [showJson, setShowJson] = useState(false)
@@ -37,13 +43,15 @@ export default function PreviewPanel({
           <Braces className="size-4" />
         </Button>
       </div>
-      <div className="flex-1 overflow-auto p-4">
+      <div className="min-h-0 flex-1">
         {showJson ? (
-          <pre className="bg-accent rounded p-3 text-xs">
-            {JSON.stringify(fields, null, 2)}
-          </pre>
+          <div className="h-full overflow-auto p-4">
+            <pre className="bg-accent rounded p-3 text-xs">
+              {JSON.stringify(fields, null, 2)}
+            </pre>
+          </div>
         ) : (
-          <FormPreview fields={fields} />
+          <ThemedPreview theme={theme} mode={mode} fields={fields} />
         )}
       </div>
     </div>

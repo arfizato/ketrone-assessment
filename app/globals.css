@@ -137,3 +137,56 @@
     appearance: textfield;
     }
 }
+
+/* ------------------------------------------------------------------ */
+/* Form theming layer.                                                */
+/* These rules are intentionally UNLAYERED so they win over Tailwind  */
+/* utilities of equal specificity (utilities live in a later layer).  */
+/* They react to the CSS vars set by resolveTheme() (spread onto the  */
+/* wrapper's style) and the data-* enum attributes on .themed-form.   */
+/* The exact same rules are meant to be included in the embed's       */
+/* compiled stylesheet later — nothing here depends on :root.         */
+/* ------------------------------------------------------------------ */
+
+.themed-form {
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+/* density — field gap (FormPreview's form is flex/gap) + control height */
+.themed-form form {
+  gap: var(--field-gap);
+}
+.themed-form [data-slot="input"],
+.themed-form [data-slot="select-trigger"] {
+  height: var(--control-height);
+}
+
+/* container — card wraps the form; flat blends into the host page */
+.themed-form[data-container="card"] {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) + 0.25rem);
+  box-shadow: var(--form-shadow);
+  padding: 1.5rem;
+}
+.themed-form[data-container="flat"] {
+  background: transparent;
+  box-shadow: none;
+}
+
+/* field style — filled: muted background, no border */
+.themed-form[data-field-style="filled"] [data-slot="input"],
+.themed-form[data-field-style="filled"] [data-slot="select-trigger"] {
+  background: var(--muted);
+  border-color: transparent;
+}
+/* field style — underlined: bottom border only, square, flush */
+.themed-form[data-field-style="underlined"] [data-slot="input"],
+.themed-form[data-field-style="underlined"] [data-slot="select-trigger"] {
+  border-width: 0 0 1px 0;
+  border-radius: 0;
+  background: transparent;
+  padding-left: 0;
+  padding-right: 0;
+}
