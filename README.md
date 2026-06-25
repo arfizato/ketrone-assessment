@@ -17,6 +17,7 @@ sanitises, persists to Firestore, and forwards each one to the firm's webhook wi
 ## Local development setup
 
 ### Prerequisites
+
 - **Node.js 20+** and npm
 - **Java 11+ (JRE)** — required by the Firestore emulator (`firebase-tools` runs it on the JVM)
 
@@ -24,11 +25,13 @@ No GCP account, billing, or real credentials are needed — everything runs agai
 local emulator, fully offline.
 
 ### 1. Install dependencies
+
 ```bash
 npm install
 ```
 
 ### 2. Create the local secrets (gitignored)
+
 Two files are kept out of version control. Create them from the checked-in templates:
 
 ```bash
@@ -40,6 +43,7 @@ npm run gen:key
 ```
 
 `.env.local` configures the emulator connection:
+
 ```
 FIRESTORE_EMULATOR_HOST=127.0.0.1:8910
 GCLOUD_PROJECT=demo-ketrone
@@ -52,42 +56,51 @@ Firestore client's REST transport can sign a self-signed JWT locally (see
 [lib/firestore.ts](lib/firestore.ts)). `npm run gen:key` writes a fresh throwaway RSA
 key into the file (pass `--force` to regenerate an existing one).
 
-### 3. Start the Firestore emulator *(terminal 1)*
+### 3. Start the Firestore emulator _(terminal 1)_
+
 ```bash
 npm run emulator
 ```
+
 Firestore on `:8910`, emulator UI on `:4000`.
 
-### 4. Seed demo forms *(terminal 2, once)*
+### 4. Seed demo forms _(terminal 2, once)_
+
 ```bash
 npm run seed
 ```
+
 Loads the three sample forms from `data/forms.json` — the same ids the demo host page embeds.
 
-### 5. Start the app *(terminal 2)*
+### 5. Start the app _(terminal 2)_
+
 ```bash
 npm run dev
 ```
+
 The `predev` hook bundles the embed runtime (`embed/entry.tsx` → `public/embed.js`) via
 esbuild, then Next.js serves on **http://localhost:3300**.
 
-| Service | URL |
-|---|---|
-| Builder | http://localhost:3300/projects |
-| Config + submit API | http://localhost:3300/api/forms/`<id>` |
-| Embed demo (hostile-CSS host page) | http://localhost:3300/host.html |
-| Firestore emulator UI | http://localhost:4000 |
+| Service                            | URL                                    |
+| ---------------------------------- | -------------------------------------- |
+| Builder                            | http://localhost:3300/projects         |
+| Config + submit API                | http://localhost:3300/api/forms/`<id>` |
+| Embed demo (hostile-CSS host page) | http://localhost:3300/example.html     |
+| Firestore emulator UI              | http://localhost:4000                  |
 
-Open **http://localhost:3300/host.html** to see three forms embedded via a single
+Open **http://localhost:3300/example.html** to see three forms embedded via a single
 `<script>` tag each, rendering correctly despite the page's deliberately hostile global CSS.
 
 ### Iterating on the embed runtime
+
 `npm run dev` builds `embed.js` once at startup. While editing the widget, rebuild on change:
+
 ```bash
 npm run build:embed:watch
 ```
 
 ### Other scripts
+
 ```bash
 npm test          # vitest — HMAC signing, origin checks, embed snippet, …
 npm run typecheck # tsc --noEmit
@@ -105,6 +118,7 @@ Implementation: [lib/webhook.ts](lib/webhook.ts), dispatched from the
 [submit route](app/api/forms/[id]/submit/route.ts).
 
 **Signing scheme**
+
 - Algorithm: **HMAC-SHA256**, keyed by a per-form shared secret (`webhookSecret`).
 - The signed string is **`<timestamp>.<body>`** — not just the body. Binding the
   timestamp into the signature gives replay protection: a captured payload can't be
@@ -120,12 +134,13 @@ header. `verifySignature()` is the reference implementation we ship — it uses
 doesn't leak information through timing.
 
 **Operational properties**
+
 - Signing is **conditional** — applied only when a `webhookSecret` is configured for the
   form (the timestamp header is always sent).
 - The secret never leaves the server: it lives in the full form `Config` but is stripped
   by `toPublicForm()` / `PublicConfigSchema` before any config reaches the browser.
 - Delivery is **best-effort and non-blocking**: a 5s `AbortController` timeout, and
-  `dispatchWebhook` never throws. The submission is persisted to Firestore *before* the
+  `dispatchWebhook` never throws. The submission is persisted to Firestore _before_ the
   webhook fires, so a failed delivery is recorded on the submission (not bounced back to
   the user) and the firm can replay from Firestore.
 
@@ -143,7 +158,7 @@ and the script self-bootstraps on load. Implementation:
    (`new URL(script.src).origin`) — so the snippet works regardless of which domain hosts it.
 2. **Isolate.** It inserts a `<div>` right after the script and attaches a **Shadow DOM**
    (`mode: "open"`) with `:host { all: initial }` plus its own scoped stylesheet. This is
-   why the form renders correctly even on `host.html`'s deliberately hostile global CSS —
+   why the form renders correctly even on `example.html`'s deliberately hostile global CSS —
    the host page's styles can't pierce the shadow boundary, and ours can't leak out.
 3. **Fetch config.** It calls `GET ${origin}/api/forms/<id>` with **`cache: "no-store"`**.
    That's the key to instant updates: every page view pulls the live config, so a save in
