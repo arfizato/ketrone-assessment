@@ -16,7 +16,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "emulator": "firebase emulators:start --only firestore --project demo-ketrone",
+    "emulator": "firebase emulators:start --project demo-ketrone",
     "seed": "node scripts/seed-firestore.mjs"
   },
   "dependencies": {
