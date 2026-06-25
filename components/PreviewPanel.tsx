@@ -47,7 +47,7 @@ export default function PreviewPanel({
         {showJson ? (
           <div className="h-full overflow-auto p-4">
             <pre className="bg-accent rounded p-3 text-xs">
-              {JSON.stringify(fields, null, 2)}
+              {JSON.stringify({ fields, theme }, null, 2)}
             </pre>
           </div>
         ) : (
