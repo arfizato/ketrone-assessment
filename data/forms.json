@@ -1,0 +1,143 @@
+[
+  {
+    "id": "frm_8m2kd9q1",
+    "title": "Create a Company",
+    "subtitle": "Corporate formation intake",
+    "submitLabel": "Start formation",
+    "theme": {
+      "base": "slate",
+      "accent": "#6366f1",
+      "radius": 0.625,
+      "font": "inter",
+      "density": "compact",
+      "shadow": "medium",
+      "container": "card",
+      "fieldStyle": "outlined",
+      "appearance": "dark"
+    },
+    "fields": [
+      {
+        "id": "companyName",
+        "type": "text",
+        "data": {
+          "label": "Company Name Preference",
+          "placeholder": "e.g. Northwind Holdings LLC",
+          "required": true
+        }
+      },
+      {
+        "id": "entityType",
+        "type": "select",
+        "data": {
+          "label": "Entity Type",
+          "required": true,
+          "options": [
+            { "label": "LLC", "value": "LLC" },
+            { "label": "C-Corp", "value": "C-Corp" },
+            { "label": "S-Corp", "value": "S-Corp" }
+          ]
+        }
+      },
+      {
+        "id": "state",
+        "type": "select",
+        "data": {
+          "label": "State of Incorporation",
+          "required": true,
+          "options": [
+            { "label": "Delaware", "value": "DE" },
+            { "label": "California", "value": "CA" },
+            { "label": "New York", "value": "NY" },
+            { "label": "Texas", "value": "TX" },
+            { "label": "Wyoming", "value": "WY" }
+          ]
+        }
+      },
+      {
+        "id": "shareholders",
+        "type": "table",
+        "data": {
+          "label": "Shareholder List",
+          "columns": [
+            { "label": "Name", "type": "Text" },
+            { "label": "Ownership", "type": "Percent" }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "frm_q4p7zt6b",
+    "title": "Review Contract",
+    "subtitle": "Intake & document gateway",
+    "submitLabel": "Submit for review",
+    "theme": {
+      "base": "gray",
+      "accent": "#1e3a8a",
+      "radius": 0.375,
+      "font": "lora",
+      "density": "comfortable",
+      "shadow": "subtle",
+      "container": "card",
+      "fieldStyle": "outlined",
+      "appearance": "light"
+    },
+    "fields": [
+      {
+        "id": "clientName",
+        "type": "text",
+        "data": {
+          "label": "Client Name",
+          "placeholder": "Full legal name",
+          "required": true
+        }
+      },
+      {
+        "id": "email",
+        "type": "text",
+        "data": {
+          "label": "Corporate Email",
+          "placeholder": "name@firm.com",
+          "required": true,
+          "validation": "Email"
+        }
+      },
+      {
+        "id": "contractType",
+        "type": "select",
+        "data": {
+          "label": "Contract Type",
+          "required": true,
+          "options": [
+            { "label": "NDA", "value": "NDA" },
+            { "label": "SaaS Agreement", "value": "SaaS" },
+            { "label": "Employment contract", "value": "Employment" }
+          ]
+        }
+      },
+      {
+        "id": "urgency",
+        "type": "radio",
+        "data": {
+          "label": "Urgency Level",
+          "required": true,
+          "helperLabel": "High urgency triggers immediate escalation and priority billing.",
+          "options": [
+            { "label": "Low", "value": "Low" },
+            { "label": "Medium", "value": "Medium" },
+            { "label": "High", "value": "High" }
+          ]
+        }
+      },
+      {
+        "id": "agreement",
+        "type": "file",
+        "data": {
+          "label": "PDF Agreement Upload",
+          "required": true,
+          "validation": "PDF"
+        }
+      }
+    ]
+  }
+]

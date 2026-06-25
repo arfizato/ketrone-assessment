@@ -1,0 +1,230 @@
+:host {
+  all: initial;
+  display: block;
+}
+
+.form-root {
+  box-sizing: border-box;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  color: var(--foreground, #111);
+  -webkit-font-smoothing: antialiased;
+}
+.form-root *,
+.form-root *::before,
+.form-root *::after {
+  box-sizing: border-box;
+}
+
+/* --- ported .themed-form layer (mirrors app/globals.css) --- */
+.themed-form {
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+.themed-form .form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--field-gap, 1.25rem);
+}
+.themed-form [data-slot="input"],
+.themed-form [data-slot="select-trigger"] {
+  height: var(--control-height, 2.25rem);
+}
+.themed-form[data-container="card"] {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) + 0.25rem);
+  box-shadow: var(--form-shadow);
+  padding: 1.5rem;
+}
+.themed-form[data-container="flat"] {
+  background: transparent;
+  box-shadow: none;
+}
+.themed-form[data-field-style="filled"] [data-slot="input"],
+.themed-form[data-field-style="filled"] [data-slot="select-trigger"] {
+  background: var(--muted);
+  border-color: transparent;
+}
+.themed-form[data-field-style="underlined"] [data-slot="input"],
+.themed-form[data-field-style="underlined"] [data-slot="select-trigger"] {
+  border-width: 0 0 1px 0;
+  border-radius: 0;
+  background: transparent;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* --- element styling keyed to the resolveTheme() variables --- */
+.form-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+.form-subtitle {
+  margin: 0.25rem 0 0;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.field-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+}
+.req {
+  color: var(--destructive);
+}
+.control {
+  width: 100%;
+  padding: 0 0.7rem;
+  font: inherit;
+  color: var(--foreground);
+  background: var(--background);
+  border: 1px solid var(--input);
+  border-radius: var(--radius);
+  outline: none;
+}
+.control:focus-visible {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 2px color-mix(in oklch, var(--ring) 35%, transparent);
+}
+select.control {
+  appearance: none;
+  cursor: pointer;
+}
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.radio-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+.warning {
+  margin: 0.25rem 0 0;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.8rem;
+  color: var(--destructive);
+  border: 1px solid var(--destructive);
+  border-radius: var(--radius);
+  background: color-mix(in oklch, var(--destructive) 12%, transparent);
+}
+.dropzone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  color: var(--muted-foreground);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+}
+.dropzone:hover {
+  border-color: var(--ring);
+}
+.sr-file {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+.file-name {
+  font-size: 0.8rem;
+  color: var(--foreground);
+}
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+.table th {
+  padding: 0.5rem 0.6rem;
+  text-align: left;
+  font-weight: 500;
+  color: var(--foreground);
+  background: var(--muted);
+}
+.table td {
+  padding: 0.25rem;
+  border-top: 1px solid var(--border);
+}
+.cell {
+  width: 100%;
+  height: 2rem;
+  padding: 0 0.4rem;
+  font: inherit;
+  color: var(--foreground);
+  background: transparent;
+  border: 0;
+  outline: none;
+}
+.th-x {
+  width: 2.5rem;
+}
+.row-x {
+  font-size: 1.1rem;
+  color: var(--muted-foreground);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+.row-x:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.add-row {
+  align-self: flex-start;
+  padding: 0.3rem 0.7rem;
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--foreground);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+.submit {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  font: inherit;
+  font-weight: 600;
+  color: var(--primary-foreground);
+  background: var(--primary);
+  border: 0;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+.submit:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+.note {
+  margin: 0;
+  font-size: 0.85rem;
+}
+.note.ok {
+  color: var(--primary);
+}
+.note.error {
+  color: var(--destructive);
+}
+.muted {
+  font-size: 0.85rem;
+  color: var(--muted-foreground);
+}

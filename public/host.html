@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Law firm site — embed host test</title>
+    <style>
+      /* Deliberately hostile global CSS. The embedded forms must ignore ALL of it. */
+      * {
+        color: hotpink !important;
+        font-family: "Comic Sans MS", cursive !important;
+      }
+      input,
+      select,
+      button,
+      table {
+        border: 4px dashed red !important;
+        background: yellow !important;
+      }
+      body {
+        max-width: 720px;
+        margin: 40px auto;
+        padding: 0 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Acme Law — client intake</h1>
+    <p>
+      Each form below is embedded with a single &lt;script&gt; tag and must look
+      correct despite this page's hostile CSS.
+    </p>
+
+    <h2>Company formation</h2>
+    <script
+      src="http://localhost:3300/embed.js"
+      data-form="frm_8m2kd9q1"
+    ></script>
+
+    <h2>Contract review</h2>
+    <script
+      src="http://localhost:3300/embed.js"
+      data-form="frm_q4p7zt6b"
+    ></script>
+  </body>
+</html>
