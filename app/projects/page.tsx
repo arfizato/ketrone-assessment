@@ -2,6 +2,7 @@
 
 import ComponentPalette from "@/components/ComponentPalette"
 import DesignPanel from "@/components/design/DesignPanel"
+import EmbedDialog from "@/components/EmbedDialog"
 import FormBuilder from "@/components/FormBuilder"
 import PreviewPanel from "@/components/PreviewPanel"
 import {
@@ -252,7 +253,8 @@ export default function Page() {
             <ViewTabs value={view} onValueChange={setView} />
           )}
         </div>
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-2">
+          <EmbedDialog />
           {step === "content" ? (
             <Button size="sm" onClick={() => setStep("design")}>
               Design

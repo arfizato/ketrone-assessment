@@ -15,3 +15,10 @@ export async function getForm(id: string): Promise<Config | null> {
   const forms = ConfigsSchema.parse(JSON.parse(raw))
   return forms.find((f) => f.id === id) ?? null
 }
+
+/** Lightweight id + title list for the admin form picker (Publish dialog). */
+export async function listForms(): Promise<{ id: string; title: string }[]> {
+  const raw = await readFile(FORMS_PATH, "utf8")
+  const forms = ConfigsSchema.parse(JSON.parse(raw))
+  return forms.map((f) => ({ id: f.id, title: f.title }))
+}

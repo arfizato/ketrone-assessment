@@ -193,3 +193,31 @@
   padding-left: 0;
   padding-right: 0;
 }
+
+/* ------------------------------------------------------------------ */
+/* Thin, inset horizontal scrollbar (used by the embed-snippet box).  */
+/* The thumb floats inside via a transparent border + content-box clip */
+/* and the track is inset from the ends, so a fixed-height box keeps   */
+/* its rounded corners and stays aligned with the copy button.         */
+/* ------------------------------------------------------------------ */
+.scrollbar-inset {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.scrollbar-inset::-webkit-scrollbar {
+  height: 8px;
+}
+.scrollbar-inset::-webkit-scrollbar-track {
+  margin: 0 0.5rem;
+  background: transparent;
+}
+.scrollbar-inset::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 9999px;
+  background: var(--border);
+  background-clip: content-box;
+}
+.scrollbar-inset::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+  background-clip: content-box;
+}
