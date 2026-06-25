@@ -29,8 +29,15 @@ import { useBreakpoint } from "@/hooks/use-breakpoint"
 import { FormTheme } from "@/lib/theme"
 import { arrayMove } from "@dnd-kit/sortable"
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import {
   ArrowLeft,
   ArrowRight,
+  Check,
   Eye,
   Hammer,
   Loader2,
@@ -39,7 +46,14 @@ import {
   SlidersHorizontal,
 } from "lucide-react"
 import Link from "next/link"
-import { useState, useSyncExternalStore, useTransition } from "react"
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  useTransition,
+} from "react"
 import { toast } from "sonner"
 import { saveFormAction } from "../actions"
 
@@ -103,6 +117,21 @@ function useSystemDark() {
     prefersDark.snapshot,
     () => false
   )
+}
+
+/** Human "last saved …" label shown in the Save button's tooltip. */
+function lastSavedLabel(
+  savedAt: number | null,
+  now: number,
+  dirty: boolean
+): string {
+  if (savedAt == null) return dirty ? "Not saved yet" : "Nothing to save"
+  const s = Math.max(0, Math.round((now - savedAt) / 1000))
+  if (s < 5) return "Saved just now"
+  if (s < 60) return `Last saved ${s}s ago`
+  const m = Math.floor(s / 60)
+  if (m < 60) return `Last saved ${m}m ago`
+  return `Last saved ${Math.floor(m / 60)}h ago`
 }
 
 export default function ProjectEditor({
@@ -200,19 +229,51 @@ export default function ProjectEditor({
     setTheme((t) => ({ ...preset, appearance: t.appearance }))
   }
 
+  // --- saving: manual button + a silent 30s autosave, with a "last saved" label ---
+  const [lastSavedAt, setLastSavedAt] = useState<number | null>(null)
+  // ticks so the "… ago" label stays current while the tooltip is open
+  const [now, setNow] = useState(() => Date.now())
+
+  // latest values the interval-driven autosave reads (avoids stale closures)
+  const latest = useRef({ dirty, title, form, theme })
+  useEffect(() => {
+    latest.current = { dirty, title, form, theme }
+  })
+  // synchronous guard so a manual click + an autosave tick can't double-submit
+  const savingRef = useRef(false)
+
   // Persist the whole form (id + title + theme + fields) via the server action.
-  // On success the embed reflects it on its next no-store fetch — no redeploy.
-  const onSave = () => {
+  // No-ops when clean. On success the embed reflects it on its next no-store
+  // fetch — no redeploy. Silent on success (the tooltip shows the state); only
+  // failures toast, so the 30s autosave isn't noisy.
+  const save = useCallback(() => {
+    const { dirty, title, form, theme } = latest.current
+    if (savingRef.current || !dirty) return
+    savingRef.current = true
     startSaving(async () => {
       try {
         await saveFormAction({ id: slug, title, theme, fields: form })
         setDirty(false)
-        toast.success("Saved")
+        setLastSavedAt(Date.now())
       } catch {
         toast.error("Couldn't save — please try again.")
+      } finally {
+        savingRef.current = false
       }
     })
-  }
+  }, [slug, startSaving])
+
+  // autosave every 30s; the save() guard skips it when there's nothing unsaved
+  useEffect(() => {
+    const id = setInterval(save, 30_000)
+    return () => clearInterval(id)
+  }, [save])
+
+  // refresh the relative-time label every 10s
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 10_000)
+    return () => clearInterval(id)
+  }, [])
 
   const builder = (
     <FormBuilder
@@ -237,7 +298,11 @@ export default function ProjectEditor({
   // The left side swaps between the build tools (Content) and the theme
   // controls (Design); the preview panel is shared by both steps.
   const designTools = (
-    <DesignPanel theme={theme} onChange={updateTheme} onApplyPreset={applyPreset} />
+    <DesignPanel
+      theme={theme}
+      onChange={updateTheme}
+      onApplyPreset={applyPreset}
+    />
   )
 
   let main: React.ReactNode
@@ -319,19 +384,30 @@ export default function ProjectEditor({
           )}
         </div>
         <div className="flex justify-end gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onSave}
-            disabled={!dirty || isSaving}
-          >
-            {isSaving ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <Save className="size-4" />
-            )}
-            {isSaving ? "Saving…" : "Save"}
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={save}
+                  aria-label="Save form"
+                >
+                  {isSaving ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : dirty ? (
+                    <Save className="size-4" />
+                  ) : (
+                    <Check className="size-4" />
+                  )}
+                  {isSaving ? "Saving…" : dirty ? "Save" : "Saved"}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {lastSavedLabel(lastSavedAt, now, dirty)}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <EmbedDialog formId={slug} />
           {step === "content" ? (
             <Button size="sm" onClick={() => setStep("design")}>

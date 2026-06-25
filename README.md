@@ -37,7 +37,6 @@ setup/security writeup to replace this section.
 - improve navbar:
   - reorder buttons to to have publish be the CTA and right most buton
   - name field is centered in navbar + resize to fit
-- auto save (at least periodic)
 
 - form
   - make fieldforms collapsable
