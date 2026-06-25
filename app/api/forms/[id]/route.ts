@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getForm } from "@/lib/forms-store"
 
+export const dynamic = "force-dynamic"
+
 const CORS = { "Access-Control-Allow-Origin": "*" }
 
 export async function GET(

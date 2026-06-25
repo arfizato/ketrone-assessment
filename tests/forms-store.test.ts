@@ -1,12 +1,39 @@
 import { describe, expect, test } from "vitest"
-import { getForm } from "../lib/forms-store"
+import type { Config } from "../lib/schemas"
 
-describe("getForm", () => {
-  test("returns a known form by id", async () => {
-    const form = await getForm("frm_8m2kd9q1")
-    expect(form?.title).toBe("Create a Company")
+// forms-store is Firestore-backed now, so these are integration tests that need
+// a live emulator. They're skipped in the default `npm test` run (no
+// FIRESTORE_EMULATOR_HOST) and run when the emulator is up.
+const describeEmu = process.env.FIRESTORE_EMULATOR_HOST ? describe : describe.skip
+
+const sample: Config = {
+  id: "frm_test_emu",
+  title: "Emu Co",
+  theme: {
+    base: "slate",
+    accent: "#6366f1",
+    radius: 0.5,
+    font: "inter",
+    density: "compact",
+    shadow: "subtle",
+    container: "card",
+    fieldStyle: "outlined",
+    appearance: "dark",
+  },
+  fields: [],
+}
+
+describeEmu("forms-store (Firestore emulator)", () => {
+  test("saveForm + getForm round-trips; unknown id is null", async () => {
+    const { saveForm, getForm } = await import("../lib/forms-store")
+    await saveForm(sample)
+    expect((await getForm("frm_test_emu"))?.title).toBe("Emu Co")
+    expect(await getForm("frm_does_not_exist")).toBeNull()
   })
-  test("returns null for an unknown id", async () => {
-    expect(await getForm("frm_nope")).toBeNull()
+
+  test("listForms returns id + title", async () => {
+    const { listForms } = await import("../lib/forms-store")
+    const list = await listForms()
+    expect(list.find((f) => f.id === "frm_test_emu")?.title).toBe("Emu Co")
   })
 })

@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // The server SDK (@google-cloud/firestore) and the emulator bypass rules;
+    // this permissive set is only for the local emulator.
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}

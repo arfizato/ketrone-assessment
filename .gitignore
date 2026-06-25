@@ -39,3 +39,10 @@ next-env.d.ts
 
 # embed build artifact
 /public/embed.js
+
+# firebase emulator
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+/.firestore-data
+/firebase-emulator-sa.json
