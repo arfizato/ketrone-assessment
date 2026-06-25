@@ -74,7 +74,7 @@ export default function EmbedDialog({ formId }: { formId?: string }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
+        <Button size="sm">
           <Share2 className="size-4" />
           Publish
         </Button>

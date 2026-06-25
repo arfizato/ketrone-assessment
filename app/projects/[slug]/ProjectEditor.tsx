@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/resizable"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useBreakpoint } from "@/hooks/use-breakpoint"
-import type { Config } from "@/lib/schemas"
+import type { Config, FormStatus } from "@/lib/schemas"
 import { FormTheme } from "@/lib/theme"
 import { arrayMove } from "@dnd-kit/sortable"
 import {
@@ -74,6 +74,8 @@ type ProjectEditorProps = {
   initialTheme: FormTheme
   /** initial backend-integration settings (webhook + allowed origins) */
   initialSettings: FormSettings
+  /** lifecycle status (set on /projects); carried so a builder save can't wipe it */
+  initialStatus: FormStatus
 }
 
 /** Centered, underline-style Build/Preview switcher reused in the top nav (md)
@@ -146,6 +148,7 @@ export default function ProjectEditor({
   initialFields,
   initialTheme,
   initialSettings,
+  initialStatus,
 }: ProjectEditorProps) {
   // --- the backbone: a single source of truth for the whole form ---
   // seeded from the form loaded on the server (by slug)
@@ -268,12 +271,15 @@ export default function ProjectEditor({
     const config: Config = {
       id: slug,
       title,
+      status: initialStatus,
       theme,
       fields: form,
       ...(settings.webhookUrl.trim()
         ? { webhookUrl: settings.webhookUrl.trim() }
         : {}),
-      ...(settings.webhookSecret ? { webhookSecret: settings.webhookSecret } : {}),
+      ...(settings.webhookSecret
+        ? { webhookSecret: settings.webhookSecret }
+        : {}),
       ...(settings.allowedOrigins.length
         ? { allowedOrigins: settings.allowedOrigins }
         : {}),
@@ -289,7 +295,7 @@ export default function ProjectEditor({
         savingRef.current = false
       }
     })
-  }, [slug, startSaving])
+  }, [slug, startSaving, initialStatus])
 
   // autosave every 30s; the save() guard skips it when there's nothing unsaved
   useEffect(() => {
@@ -395,28 +401,31 @@ export default function ProjectEditor({
           >
             <ArrowLeft className="size-4" />
           </Link>
+          {step === "content" && bp === "md" && (
+            <ViewTabs value={view} onValueChange={setView} />
+          )}
+          <FormSettingsDialog settings={settings} onChange={updateSettings} />
+        </div>
+        {/* form name: centered in the bar, sized to its content */}
+        <div className="flex min-w-0 justify-center px-2">
           <input
             value={title}
             onChange={(e) => {
               setTitle(e.target.value)
               setDirty(true)
             }}
+            size={Math.min(Math.max(title.length, 13), 40)}
             aria-label="Form title"
             placeholder="Untitled form"
-            className="min-w-0 flex-1 truncate rounded-sm bg-transparent px-1 py-0.5 text-sm font-medium outline-none hover:bg-foreground/5 focus:bg-background focus:ring-1 focus:ring-ring"
+            className="max-w-full truncate rounded-sm bg-transparent px-2 py-0.5 text-center text-sm font-medium outline-none hover:bg-foreground/5 focus:bg-background focus:ring-1 focus:ring-ring"
           />
-        </div>
-        <div className="flex justify-center">
-          {step === "content" && bp === "md" && (
-            <ViewTabs value={view} onValueChange={setView} />
-          )}
         </div>
         <div className="flex justify-end gap-2">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  variant="outline"
+                  variant={dirty ? "outline" : "ghost"}
                   size="sm"
                   onClick={save}
                   aria-label="Save form"
@@ -436,10 +445,13 @@ export default function ProjectEditor({
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          <FormSettingsDialog settings={settings} onChange={updateSettings} />
-          <EmbedDialog formId={slug} />
+
           {step === "content" ? (
-            <Button size="sm" onClick={() => setStep("design")}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setStep("design")}
+            >
               Design
               <ArrowRight className="size-4" />
             </Button>
@@ -453,6 +465,11 @@ export default function ProjectEditor({
               Content
             </Button>
           )}
+
+          {/* <FormSettingsDialog settings={settings} onChange={updateSettings} /> */}
+
+          {/* Publish: the primary CTA, rightmost */}
+          <EmbedDialog formId={slug} />
         </div>
       </header>
 

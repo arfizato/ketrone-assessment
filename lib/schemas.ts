@@ -38,11 +38,17 @@ export const FormThemeSchema = z.object({
   appearance: z.enum(["system", "light", "dark"]),
 })
 
+/** Lifecycle status shown + filtered on the /projects list. */
+export const FORM_STATUSES = ["active", "inactive", "archived"] as const
+export type FormStatus = (typeof FORM_STATUSES)[number]
+
 export const ConfigSchema = z.object({
   id: z.string(),
   title: z.string(),
   subtitle: z.string().optional(),
   submitLabel: z.string().optional(),
+  /** lifecycle status; absent is treated as "active" */
+  status: z.enum(FORM_STATUSES).optional(),
   theme: FormThemeSchema,
   fields: z.array(FieldInstanceSchema),
   // --- backend integration (server-only; never sent to the public embed) ---

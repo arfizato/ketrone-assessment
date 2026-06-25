@@ -4,6 +4,7 @@ import {
   ConfigSchema,
   PublicConfigSchema,
   type Config,
+  type FormStatus,
   type PublicConfig,
 } from "./schemas"
 import type { WebhookResult } from "./webhook"
@@ -22,12 +23,15 @@ export async function getForm(id: string): Promise<Config | null> {
   return ConfigSchema.parse({ id: snap.id, ...snap.data() })
 }
 
-/** Lightweight id + title list for the admin form picker (Publish dialog). */
-export async function listForms(): Promise<{ id: string; title: string }[]> {
+/** Lightweight id + title + status list for the admin /projects list. */
+export async function listForms(): Promise<
+  { id: string; title: string; status: FormStatus }[]
+> {
   const snap = await db.collection(FORMS).get()
   return snap.docs.map((d) => ({
     id: d.id,
     title: (d.get("title") as string) ?? "Untitled",
+    status: (d.get("status") as FormStatus) ?? "active",
   }))
 }
 
@@ -44,8 +48,16 @@ export async function saveForm(config: Config): Promise<void> {
  */
 export async function createForm(title = "Untitled form"): Promise<string> {
   const id = `frm_${randomUUID().replace(/-/g, "").slice(0, 9)}`
-  await saveForm({ id, title, theme: DEFAULT_THEME, fields: [] })
+  await saveForm({ id, title, status: "active", theme: DEFAULT_THEME, fields: [] })
   return id
+}
+
+/** Update just a form's lifecycle status (merge — leaves the rest intact). */
+export async function setFormStatus(
+  id: string,
+  status: FormStatus
+): Promise<void> {
+  await db.collection(FORMS).doc(id).set({ status }, { merge: true })
 }
 
 /** Delete a form. (Its submissions subcollection is left for a server-side

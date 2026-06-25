@@ -19,6 +19,7 @@ export default async function Page({
       title={form.title}
       initialFields={form.fields}
       initialTheme={form.theme}
+      initialStatus={form.status ?? "active"}
       initialSettings={{
         webhookUrl: form.webhookUrl ?? "",
         webhookSecret: form.webhookSecret ?? "",

@@ -7,8 +7,9 @@ import {
   deleteForm,
   duplicateForm,
   saveForm,
+  setFormStatus,
 } from "@/lib/forms-store"
-import { ConfigSchema, type Config } from "@/lib/schemas"
+import { ConfigSchema, type Config, type FormStatus } from "@/lib/schemas"
 
 /**
  * Persist a form edited in the builder. Same-origin admin write, so it goes
@@ -42,5 +43,14 @@ export async function duplicateFormAction(id: string): Promise<void> {
 /** Delete a form. */
 export async function deleteFormAction(id: string): Promise<void> {
   await deleteForm(id)
+  revalidatePath("/projects")
+}
+
+/** Change a form's lifecycle status (active / inactive / archived). */
+export async function setFormStatusAction(
+  id: string,
+  status: FormStatus
+): Promise<void> {
+  await setFormStatus(id, status)
   revalidatePath("/projects")
 }
