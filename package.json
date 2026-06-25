@@ -17,7 +17,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "emulator": "firebase emulators:start --project demo-ketrone",
-    "seed": "node scripts/seed-firestore.mjs"
+    "seed": "node scripts/seed-firestore.mjs",
+    "gen:key": "node scripts/gen-emulator-key.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

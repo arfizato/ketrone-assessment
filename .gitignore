@@ -32,6 +32,8 @@ pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# ...but keep the checked-in template
+!.env.local.example
 
 # typescript
 *.tsbuildinfo
@@ -45,4 +47,5 @@ firebase-debug.log
 firestore-debug.log
 ui-debug.log
 /.firestore-data
+# throwaway emulator key (generate with `npm run gen:key`); template is tracked
 /firebase-emulator-sa.json
