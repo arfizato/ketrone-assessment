@@ -27,10 +27,10 @@ type FormSummary = { id: string; title: string }
  * snippet to paste on their site. Reads the available forms from /api/forms;
  * saving the current builder draft is handled separately (not yet wired).
  */
-export default function EmbedDialog() {
+export default function EmbedDialog({ formId }: { formId?: string }) {
   const [open, setOpen] = useState(false)
   const [forms, setForms] = useState<FormSummary[]>([])
-  const [selectedId, setSelectedId] = useState("")
+  const [selectedId, setSelectedId] = useState(formId ?? "")
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
 
