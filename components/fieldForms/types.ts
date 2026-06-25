@@ -20,6 +20,8 @@ export type FieldType =
   | "file"
   | "table"
   | "radio"
+  | "heading"
+  | "paragraph"
 
 export type SelectOption = {
   label: string
@@ -86,4 +88,7 @@ export const DEFAULT_FIELD_DATA: Record<FieldType, FieldData> = {
   file: { validation: "All" },
   table: { columns: [{ label: "", type: "Text" }] },
   radio: { options: [{ label: "", value: "" }] },
+  // static content fields — `label` holds the displayed text
+  heading: {},
+  paragraph: {},
 }

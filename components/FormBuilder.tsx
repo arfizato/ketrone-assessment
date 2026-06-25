@@ -1,6 +1,8 @@
 "use client"
 
 import FileForm from "@/components/fieldForms/FileForm"
+import HeadingForm from "@/components/fieldForms/HeadingForm"
+import ParagraphForm from "@/components/fieldForms/ParagraphForm"
 import RadioForm from "@/components/fieldForms/RadioForm"
 import SelectForm from "@/components/fieldForms/SelectForm"
 import TableForm from "@/components/fieldForms/TableForm"
@@ -40,6 +42,8 @@ const FIELD_COMPONENTS: Record<FieldType, ComponentType<FieldFormProps>> = {
   radio: RadioForm,
   file: FileForm,
   table: TableForm,
+  heading: HeadingForm,
+  paragraph: ParagraphForm,
 }
 
 /** One sortable field card with its drag / duplicate / delete control rail. */

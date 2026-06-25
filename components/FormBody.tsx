@@ -137,6 +137,12 @@ function Field({
   const { data } = field
 
   switch (field.type) {
+    case "heading":
+      return <h3 className="form-heading">{data.label}</h3>
+
+    case "paragraph":
+      return <p className="form-paragraph">{data.label}</p>
+
     case "text":
       return (
         <div className="field">

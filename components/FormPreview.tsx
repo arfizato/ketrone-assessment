@@ -127,6 +127,20 @@ function PreviewField({
   const { data } = field
 
   switch (field.type) {
+    case "heading":
+      return (
+        <h3 className="text-base font-semibold text-foreground">
+          {data.label?.trim() || "Heading"}
+        </h3>
+      )
+
+    case "paragraph":
+      return (
+        <p className="text-sm whitespace-pre-line text-muted-foreground">
+          {data.label?.trim() || "Descriptive paragraph text."}
+        </p>
+      )
+
     case "text":
       return (
         <Field>

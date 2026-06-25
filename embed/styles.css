@@ -65,6 +65,20 @@
   font-size: 0.875rem;
   color: var(--muted-foreground);
 }
+/* static content fields (heading / paragraph) */
+.form-heading {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.form-paragraph {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  white-space: pre-line;
+  color: var(--muted-foreground);
+}
 .field {
   display: flex;
   flex-direction: column;

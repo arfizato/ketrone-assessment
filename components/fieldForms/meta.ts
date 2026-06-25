@@ -1,7 +1,9 @@
 import {
   AlignLeft,
   CircleDot,
+  Heading,
   List,
+  Pilcrow,
   Table,
   Type,
   Upload,
@@ -27,6 +29,8 @@ export const FIELD_META: Record<FieldType, FieldMeta> = {
   radio: { name: "Radio", desc: "Single choice from a list", icon: CircleDot },
   file: { name: "File", desc: "File upload", icon: Upload },
   table: { name: "Table", desc: "Editable grid", icon: Table },
+  heading: { name: "Heading", desc: "Section heading", icon: Heading },
+  paragraph: { name: "Paragraph", desc: "Explanatory text", icon: Pilcrow },
 }
 
 /** Display order of field types in the palette. */
@@ -37,4 +41,6 @@ export const FIELD_ORDER: FieldType[] = [
   "radio",
   "file",
   "table",
+  "heading",
+  "paragraph",
 ]
