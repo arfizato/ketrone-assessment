@@ -4,6 +4,9 @@ import ComponentPalette from "@/components/ComponentPalette"
 import DesignPanel from "@/components/design/DesignPanel"
 import EmbedDialog from "@/components/EmbedDialog"
 import FormBuilder from "@/components/FormBuilder"
+import FormSettingsDialog, {
+  type FormSettings,
+} from "@/components/FormSettingsDialog"
 import PreviewPanel from "@/components/PreviewPanel"
 import {
   DEFAULT_FIELD_DATA,
@@ -26,6 +29,7 @@ import {
 } from "@/components/ui/resizable"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useBreakpoint } from "@/hooks/use-breakpoint"
+import type { Config } from "@/lib/schemas"
 import { FormTheme } from "@/lib/theme"
 import { arrayMove } from "@dnd-kit/sortable"
 import {
@@ -68,6 +72,8 @@ type ProjectEditorProps = {
   /** initial fields + theme loaded from Firestore on the server */
   initialFields: FieldInstance[]
   initialTheme: FormTheme
+  /** initial backend-integration settings (webhook + allowed origins) */
+  initialSettings: FormSettings
 }
 
 /** Centered, underline-style Build/Preview switcher reused in the top nav (md)
@@ -139,13 +145,16 @@ export default function ProjectEditor({
   title: initialTitle,
   initialFields,
   initialTheme,
+  initialSettings,
 }: ProjectEditorProps) {
   // --- the backbone: a single source of truth for the whole form ---
   // seeded from the form loaded on the server (by slug)
   const [title, setTitle] = useState(initialTitle)
   const [form, setForm] = useState<FieldInstance[]>(initialFields)
   const [theme, setTheme] = useState<FormTheme>(initialTheme)
-  // any edit to title / fields / theme marks the form unsaved; cleared on save
+  // backend integration: webhook destination, signing secret, allowed origins
+  const [settings, setSettings] = useState<FormSettings>(initialSettings)
+  // any edit to title / fields / theme / settings marks the form unsaved
   const [dirty, setDirty] = useState(false)
   const [isSaving, startSaving] = useTransition()
   // top-level step: build the content, then design it
@@ -229,30 +238,49 @@ export default function ProjectEditor({
     setTheme((t) => ({ ...preset, appearance: t.appearance }))
   }
 
+  const updateSettings = (patch: Partial<FormSettings>) => {
+    setDirty(true)
+    setSettings((s) => ({ ...s, ...patch }))
+  }
+
   // --- saving: manual button + a silent 30s autosave, with a "last saved" label ---
   const [lastSavedAt, setLastSavedAt] = useState<number | null>(null)
   // ticks so the "… ago" label stays current while the tooltip is open
   const [now, setNow] = useState(() => Date.now())
 
   // latest values the interval-driven autosave reads (avoids stale closures)
-  const latest = useRef({ dirty, title, form, theme })
+  const latest = useRef({ dirty, title, form, theme, settings })
   useEffect(() => {
-    latest.current = { dirty, title, form, theme }
+    latest.current = { dirty, title, form, theme, settings }
   })
   // synchronous guard so a manual click + an autosave tick can't double-submit
   const savingRef = useRef(false)
 
-  // Persist the whole form (id + title + theme + fields) via the server action.
-  // No-ops when clean. On success the embed reflects it on its next no-store
-  // fetch — no redeploy. Silent on success (the tooltip shows the state); only
-  // failures toast, so the 30s autosave isn't noisy.
+  // Persist the whole form via the server action. No-ops when clean. On success
+  // the embed reflects it on its next no-store fetch — no redeploy. Silent on
+  // success (the tooltip shows the state); only failures toast, so the 30s
+  // autosave isn't noisy. Empty settings are omitted so the optional, validated
+  // config fields (e.g. webhookUrl's URL check) don't reject a blank value.
   const save = useCallback(() => {
-    const { dirty, title, form, theme } = latest.current
+    const { dirty, title, form, theme, settings } = latest.current
     if (savingRef.current || !dirty) return
     savingRef.current = true
+    const config: Config = {
+      id: slug,
+      title,
+      theme,
+      fields: form,
+      ...(settings.webhookUrl.trim()
+        ? { webhookUrl: settings.webhookUrl.trim() }
+        : {}),
+      ...(settings.webhookSecret ? { webhookSecret: settings.webhookSecret } : {}),
+      ...(settings.allowedOrigins.length
+        ? { allowedOrigins: settings.allowedOrigins }
+        : {}),
+    }
     startSaving(async () => {
       try {
-        await saveFormAction({ id: slug, title, theme, fields: form })
+        await saveFormAction(config)
         setDirty(false)
         setLastSavedAt(Date.now())
       } catch {
@@ -408,6 +436,7 @@ export default function ProjectEditor({
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
+          <FormSettingsDialog settings={settings} onChange={updateSettings} />
           <EmbedDialog formId={slug} />
           {step === "content" ? (
             <Button size="sm" onClick={() => setStep("design")}>

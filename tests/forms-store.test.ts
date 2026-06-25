@@ -47,4 +47,15 @@ describeEmu("forms-store (Firestore emulator)", () => {
     // a real theme was stored (passes ConfigSchema on read)
     expect(form?.theme.base).toBeTruthy()
   })
+
+  test("saveSubmission stores under the form and returns a doc id", async () => {
+    const { saveForm, saveSubmission } = await import("../lib/forms-store")
+    await saveForm(sample)
+    const subId = await saveSubmission("frm_test_emu", {
+      values: { name: "Jo" },
+      origin: "https://firm.com",
+    })
+    expect(typeof subId).toBe("string")
+    expect(subId.length).toBeGreaterThan(0)
+  })
 })

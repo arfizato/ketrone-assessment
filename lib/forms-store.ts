@@ -1,6 +1,12 @@
 import { randomUUID } from "node:crypto"
-import { db, FORMS } from "./firestore"
-import { ConfigSchema, type Config } from "./schemas"
+import { db, FORMS, SUBMISSIONS } from "./firestore"
+import {
+  ConfigSchema,
+  PublicConfigSchema,
+  type Config,
+  type PublicConfig,
+} from "./schemas"
+import type { WebhookResult } from "./webhook"
 import { DEFAULT_THEME } from "./theme"
 
 /**
@@ -40,4 +46,38 @@ export async function createForm(title = "Untitled form"): Promise<string> {
   const id = `frm_${randomUUID().replace(/-/g, "").slice(0, 9)}`
   await saveForm({ id, title, theme: DEFAULT_THEME, fields: [] })
   return id
+}
+
+/** Strip server-only secrets so the form is safe to send to the public embed. */
+export function toPublicForm(config: Config): PublicConfig {
+  // PublicConfigSchema omits webhookUrl/webhookSecret/allowedOrigins, and Zod
+  // drops keys not in the schema — so the parse guarantees they can't leak.
+  return PublicConfigSchema.parse(config)
+}
+
+/** Store one submission under forms/<id>/submissions. Returns the new doc id. */
+export async function saveSubmission(
+  formId: string,
+  submission: { values: Record<string, unknown>; origin: string | null }
+): Promise<string> {
+  const ref = await db
+    .collection(FORMS)
+    .doc(formId)
+    .collection(SUBMISSIONS)
+    .add({ ...submission, submittedAt: new Date().toISOString() })
+  return ref.id
+}
+
+/** Record the outbound webhook outcome on a stored submission (best-effort). */
+export async function recordWebhookResult(
+  formId: string,
+  submissionId: string,
+  webhook: WebhookResult
+): Promise<void> {
+  await db
+    .collection(FORMS)
+    .doc(formId)
+    .collection(SUBMISSIONS)
+    .doc(submissionId)
+    .set({ webhook }, { merge: true })
 }

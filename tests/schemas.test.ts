@@ -1,5 +1,9 @@
 import { describe, expect, test } from "vitest"
-import { ConfigSchema, SubmissionSchema } from "../lib/schemas"
+import {
+  ConfigSchema,
+  PublicConfigSchema,
+  SubmissionSchema,
+} from "../lib/schemas"
 
 const validConfig = {
   id: "frm_x",
@@ -29,6 +33,39 @@ describe("ConfigSchema", () => {
   test("rejects a bad theme enum", () => {
     const bad = { ...validConfig, theme: { ...validConfig.theme, density: "huge" } }
     expect(ConfigSchema.safeParse(bad).success).toBe(false)
+  })
+})
+
+describe("ConfigSchema — backend integration fields", () => {
+  test("accepts optional webhook + origins", () => {
+    const cfg = ConfigSchema.parse({
+      ...validConfig,
+      webhookUrl: "https://api.firm.com/intake",
+      webhookSecret: "s3cret",
+      allowedOrigins: ["https://firm.com"],
+    })
+    expect(cfg.webhookUrl).toBe("https://api.firm.com/intake")
+  })
+  test("rejects a non-URL webhookUrl", () => {
+    const bad = { ...validConfig, webhookUrl: "not-a-url" }
+    expect(ConfigSchema.safeParse(bad).success).toBe(false)
+  })
+})
+
+describe("PublicConfigSchema", () => {
+  test("drops server-only secrets from the public projection", () => {
+    const pub = PublicConfigSchema.parse({
+      ...validConfig,
+      webhookUrl: "https://api.firm.com/intake",
+      webhookSecret: "s3cret",
+      allowedOrigins: ["https://firm.com"],
+    }) as Record<string, unknown>
+    expect(pub.webhookUrl).toBeUndefined()
+    expect(pub.webhookSecret).toBeUndefined()
+    expect(pub.allowedOrigins).toBeUndefined()
+    // ...but keeps the public layout
+    expect(pub.title).toBe("T")
+    expect(Array.isArray(pub.fields)).toBe(true)
   })
 })
 

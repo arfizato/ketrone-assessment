@@ -45,6 +45,20 @@ export const ConfigSchema = z.object({
   submitLabel: z.string().optional(),
   theme: FormThemeSchema,
   fields: z.array(FieldInstanceSchema),
+  // --- backend integration (server-only; never sent to the public embed) ---
+  /** where verified submissions are forwarded as a signed JSON payload */
+  webhookUrl: z.string().url().optional(),
+  /** shared secret used to HMAC-SHA256-sign outbound webhooks */
+  webhookSecret: z.string().optional(),
+  /** registered domains allowed to embed + submit; empty/absent = open */
+  allowedOrigins: z.array(z.string()).optional(),
+})
+
+/** The public projection sent to the embed — drops every server-only secret. */
+export const PublicConfigSchema = ConfigSchema.omit({
+  webhookUrl: true,
+  webhookSecret: true,
+  allowedOrigins: true,
 })
 
 export const ConfigsSchema = z.array(ConfigSchema)
@@ -55,4 +69,5 @@ export const SubmissionSchema = z.object({
 })
 
 export type Config = z.infer<typeof ConfigSchema>
+export type PublicConfig = z.infer<typeof PublicConfigSchema>
 export type Submission = z.infer<typeof SubmissionSchema>

@@ -27,3 +27,6 @@ if (process.env.NODE_ENV !== "production") globalForFirestore.__db = db
 
 /** Collection holding one document per form, keyed by form id. */
 export const FORMS = "forms"
+
+/** Per-form subcollection of received submissions (forms/<id>/submissions). */
+export const SUBMISSIONS = "submissions"
