@@ -5,6 +5,7 @@ import RadioForm from "@/components/fieldForms/RadioForm"
 import SelectForm from "@/components/fieldForms/SelectForm"
 import TableForm from "@/components/fieldForms/TableForm"
 import TextForm from "@/components/fieldForms/TextForm"
+import TextareaForm from "@/components/fieldForms/TextareaForm"
 import {
   FieldData,
   FieldFormProps,
@@ -34,6 +35,7 @@ import { ComponentType, useState } from "react"
 
 const FIELD_COMPONENTS: Record<FieldType, ComponentType<FieldFormProps>> = {
   text: TextForm,
+  textarea: TextareaForm,
   select: SelectForm,
   radio: RadioForm,
   file: FileForm,

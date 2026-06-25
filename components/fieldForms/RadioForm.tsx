@@ -30,12 +30,7 @@ function RadioForm({ field, update, open, onToggle }: FieldFormProps) {
   const addOpt = () => setOpts([...opts, { label: "", value: "" }])
 
   return (
-    <FieldFormCard
-      type={field.type}
-      label={data.label}
-      open={open}
-      onToggle={onToggle}
-    >
+    <FieldFormCard field={field} open={open} onToggle={onToggle}>
       <Field aria-required>
         <FieldLabel>Label</FieldLabel>
         <Input

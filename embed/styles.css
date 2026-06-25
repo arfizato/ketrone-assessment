@@ -96,6 +96,15 @@ select.control {
   appearance: none;
   cursor: pointer;
 }
+/* textarea reuses [data-slot=input] for theming but must grow, not be fixed
+   to --control-height like single-line inputs */
+.themed-form textarea[data-slot="input"] {
+  height: auto;
+  min-height: 5rem;
+  padding: 0.5rem 0.7rem;
+  line-height: 1.5;
+  resize: vertical;
+}
 .radio-group {
   display: flex;
   flex-direction: column;

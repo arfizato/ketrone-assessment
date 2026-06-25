@@ -2,19 +2,11 @@
 
 import { Field, FieldDescription, FieldError, FieldLabel } from "../ui/field"
 import { Input } from "../ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select"
 import { Switch } from "../ui/switch"
 import { FieldFormCard } from "./FieldFormCard"
 import { FieldFormProps } from "./types"
 
-function FileForm({ field, update, open, onToggle }: FieldFormProps) {
+function TextareaForm({ field, update, open, onToggle }: FieldFormProps) {
   const { data } = field
 
   return (
@@ -22,7 +14,7 @@ function FileForm({ field, update, open, onToggle }: FieldFormProps) {
       <Field aria-required>
         <FieldLabel>Label</FieldLabel>
         <Input
-          placeholder="Upload your CV"
+          placeholder="Describe your situation"
           value={data.label ?? ""}
           onChange={(e) => update({ label: e.target.value })}
         />
@@ -30,32 +22,13 @@ function FileForm({ field, update, open, onToggle }: FieldFormProps) {
       </Field>
 
       <Field>
-        <FieldLabel>Drop-zone text</FieldLabel>
+        <FieldLabel>Placeholder</FieldLabel>
         <Input
-          placeholder="Drag & drop a file, or click to browse"
+          placeholder="Add any details that will help us…"
           value={data.placeholder ?? ""}
           onChange={(e) => update({ placeholder: e.target.value })}
         />
         <FieldError></FieldError>
-      </Field>
-
-      <Field className="w-full max-w-xs">
-        <FieldLabel>Accepted files</FieldLabel>
-        <Select
-          value={data.validation ?? "All"}
-          onValueChange={(value) => update({ validation: value })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="All" />
-          </SelectTrigger>
-          <SelectContent position="popper">
-            <SelectGroup>
-              <SelectItem value="All">All</SelectItem>
-              <SelectItem value="PDF">PDF</SelectItem>
-              <SelectItem value="Image">Image</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
       </Field>
 
       <Field orientation="horizontal" className="w-full justify-between">
@@ -72,4 +45,4 @@ function FileForm({ field, update, open, onToggle }: FieldFormProps) {
   )
 }
 
-export default FileForm
+export default TextareaForm

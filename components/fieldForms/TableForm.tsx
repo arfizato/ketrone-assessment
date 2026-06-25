@@ -41,12 +41,7 @@ function TableForm({ field, update, open, onToggle }: FieldFormProps) {
   const addColumn = () => setColumns([...columns, { label: "", type: "Text" }])
 
   return (
-    <FieldFormCard
-      type={field.type}
-      label={data.label}
-      open={open}
-      onToggle={onToggle}
-    >
+    <FieldFormCard field={field} open={open} onToggle={onToggle}>
       <Field aria-required>
         <FieldLabel>Label</FieldLabel>
         <Input

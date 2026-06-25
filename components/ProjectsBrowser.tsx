@@ -4,16 +4,18 @@ import Link from "next/link"
 import { useState } from "react"
 import FormCardActions from "@/components/FormCardActions"
 import FormStatusBadge, { STATUS_META } from "@/components/FormStatusBadge"
-import { FORM_STATUSES, type FormStatus } from "@/lib/schemas"
+import FormThumb from "@/components/FormThumb"
+import type { FormSummary } from "@/lib/forms-store"
+import { FORM_STATUSES } from "@/lib/schemas"
 import { cn } from "@/lib/utils"
 
-type FormSummary = { id: string; title: string; status: FormStatus }
-type Filter = "all" | FormStatus
+type Filter = "all" | (typeof FORM_STATUSES)[number]
 
 /**
- * The /projects list: status filter chips over a grid of form cards. Each card
- * is a full-card link with a status pill (bottom-left) and duplicate/delete
- * controls (top-right) overlaid as siblings so they don't trigger navigation.
+ * The /projects list: status filter chips over a list of form rows. Each row
+ * is a stretched-link card — the whole row navigates, while the status pill and
+ * the duplicate/delete controls sit above it (pointer-events-auto) so they keep
+ * their own clicks.
  */
 export default function ProjectsBrowser({ forms }: { forms: FormSummary[] }) {
   const [filter, setFilter] = useState<Filter>("all")
@@ -21,7 +23,8 @@ export default function ProjectsBrowser({ forms }: { forms: FormSummary[] }) {
   const countFor = (key: Filter) =>
     key === "all" ? forms.length : forms.filter((f) => f.status === key).length
 
-  const visible = filter === "all" ? forms : forms.filter((f) => f.status === filter)
+  const visible =
+    filter === "all" ? forms : forms.filter((f) => f.status === filter)
 
   const chips: { key: Filter; label: string }[] = [
     { key: "all", label: "All" },
@@ -62,31 +65,45 @@ export default function ProjectsBrowser({ forms }: { forms: FormSummary[] }) {
         ) : (
           <p className="text-sm text-muted-foreground">
             No{" "}
-            {filter === "all" ? "" : STATUS_META[filter].label.toLowerCase() + " "}
+            {filter === "all"
+              ? ""
+              : STATUS_META[filter].label.toLowerCase() + " "}
             forms.
           </p>
         )
       ) : (
-        <ul className="grid gap-3 sm:grid-cols-2">
+        <ul className="flex flex-col gap-2">
           {visible.map((f) => (
-            <li key={f.id} className="relative">
+            <li
+              key={f.id}
+              className="relative flex items-center gap-3 rounded-lg border bg-card p-3 transition-colors hover:border-foreground/30 hover:bg-accent"
+            >
+              {/* stretched link: the whole row is the click target */}
               <Link
                 href={`/projects/${f.id}`}
-                className="block rounded-lg border bg-card p-4 pb-12 transition-colors hover:border-foreground/30 hover:bg-accent"
-              >
-                <div className="truncate pr-16 font-medium">{f.title}</div>
-                <div className="mt-1 truncate font-mono text-xs text-muted-foreground">
-                  {f.id}
-                </div>
-              </Link>
-              <div className="absolute bottom-3 left-4">
-                <FormStatusBadge id={f.id} status={f.status} />
-              </div>
-              <FormCardActions
-                id={f.id}
-                title={f.title}
-                className="absolute right-2 top-2"
+                aria-label={f.title || "Untitled form"}
+                className="absolute inset-0 z-0 rounded-lg"
               />
+              <div className="pointer-events-none relative z-10 flex w-full items-center gap-3">
+                <FormThumb id={f.id} />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="truncate font-medium">
+                      {f.title || "Untitled form"}
+                    </span>
+                    <span className="pointer-events-auto shrink-0">
+                      <FormStatusBadge id={f.id} status={f.status} />
+                    </span>
+                  </div>
+                  <div className="mt-0.5 truncate text-xs text-muted-foreground">
+                    {f.fieldCount} {f.fieldCount === 1 ? "field" : "fields"}
+                    {f.subtitle ? ` · ${f.subtitle}` : ""}
+                  </div>
+                </div>
+                <div className="pointer-events-auto shrink-0">
+                  <FormCardActions id={f.id} title={f.title} />
+                </div>
+              </div>
             </li>
           ))}
         </ul>

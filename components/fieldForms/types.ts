@@ -13,7 +13,13 @@
  *   4. register it in FIELD_COMPONENTS in page.tsx
  */
 
-export type FieldType = "text" | "select" | "file" | "table" | "radio"
+export type FieldType =
+  | "text"
+  | "textarea"
+  | "select"
+  | "file"
+  | "table"
+  | "radio"
 
 export type SelectOption = {
   label: string
@@ -75,6 +81,7 @@ export type FieldFormProps = {
 /** Starting data when a field of a given type is first added. */
 export const DEFAULT_FIELD_DATA: Record<FieldType, FieldData> = {
   text: {},
+  textarea: {},
   select: { options: [{ label: "", value: "" }] },
   file: { validation: "All" },
   table: { columns: [{ label: "", type: "Text" }] },

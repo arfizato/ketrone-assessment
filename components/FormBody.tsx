@@ -152,6 +152,21 @@ function Field({
         </div>
       )
 
+    case "textarea":
+      return (
+        <div className="field">
+          <Label data={data} />
+          <textarea
+            className="control"
+            data-slot="input"
+            rows={4}
+            placeholder={data.placeholder}
+            value={(value as string) ?? ""}
+            onChange={(e) => onChange(e.currentTarget.value)}
+          />
+        </div>
+      )
+
     case "select": {
       const options = (data.options ?? []).filter(
         (o) => o.value.trim() && o.label.trim()

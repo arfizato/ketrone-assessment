@@ -22,7 +22,7 @@ export const FieldDataSchema = z.object({
 
 export const FieldInstanceSchema = z.object({
   id: z.string(),
-  type: z.enum(["text", "select", "file", "table", "radio"]),
+  type: z.enum(["text", "textarea", "select", "file", "table", "radio"]),
   data: FieldDataSchema,
 })
 

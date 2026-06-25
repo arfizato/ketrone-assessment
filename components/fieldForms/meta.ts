@@ -1,4 +1,5 @@
 import {
+  AlignLeft,
   CircleDot,
   List,
   Table,
@@ -21,6 +22,7 @@ export type FieldMeta = {
  */
 export const FIELD_META: Record<FieldType, FieldMeta> = {
   text: { name: "Text", desc: "Single-line input", icon: Type },
+  textarea: { name: "Textarea", desc: "Multi-line text", icon: AlignLeft },
   select: { name: "Select", desc: "Dropdown of options", icon: List },
   radio: { name: "Radio", desc: "Single choice from a list", icon: CircleDot },
   file: { name: "File", desc: "File upload", icon: Upload },
@@ -30,6 +32,7 @@ export const FIELD_META: Record<FieldType, FieldMeta> = {
 /** Display order of field types in the palette. */
 export const FIELD_ORDER: FieldType[] = [
   "text",
+  "textarea",
   "select",
   "radio",
   "file",

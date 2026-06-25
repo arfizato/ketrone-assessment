@@ -6,40 +6,62 @@ import { cn } from "@/lib/utils"
 import { Button } from "../ui/button"
 import { Card } from "../ui/card"
 import { FIELD_META } from "./meta"
-import { FieldType } from "./types"
+import { FieldInstance } from "./types"
+
+// A spread of distinct icon tints; a field's id picks one deterministically so
+// several cards of the same type (e.g. many Text fields) are easy to tell apart.
+const ICON_COLORS = [
+  "bg-rose-500/15 text-rose-600 dark:text-rose-400",
+  "bg-amber-500/15 text-amber-600 dark:text-amber-400",
+  "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
+  "bg-sky-500/15 text-sky-600 dark:text-sky-400",
+  "bg-violet-500/15 text-violet-600 dark:text-violet-400",
+  "bg-fuchsia-500/15 text-fuchsia-600 dark:text-fuchsia-400",
+  "bg-teal-500/15 text-teal-600 dark:text-teal-400",
+  "bg-orange-500/15 text-orange-600 dark:text-orange-400",
+]
+
+function colorFor(seed: string) {
+  let h = 0
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0
+  return ICON_COLORS[h % ICON_COLORS.length]
+}
 
 /**
  * Collapsible card wrapper shared by every field-config form. Shows the field
- * type's icon + name with the user's label as a subtitle, and a chevron that
- * collapses the config body so long forms stay scannable. Collapse state is
- * controlled by the builder list (so the drag/duplicate/delete rail can react
- * to it — only reordering stays available while collapsed).
+ * type's icon (tinted per-instance so duplicates are distinguishable) + name,
+ * with the user's label as a subtitle, and a chevron that collapses the config
+ * body. Collapse state is controlled by the builder list (so the drag rail can
+ * react to it — only reordering stays available while collapsed).
  */
 export function FieldFormCard({
-  type,
-  label,
+  field,
   open,
   onToggle,
   children,
 }: {
-  type: FieldType
-  label?: string
+  field: FieldInstance
   open: boolean
   onToggle: () => void
   children: ReactNode
 }) {
-  const { name, desc, icon: Icon } = FIELD_META[type]
-  const subtitle = label?.trim() || desc
+  const { name, desc, icon: Icon } = FIELD_META[field.type]
+  const subtitle = field.data.label?.trim() || desc
 
   return (
     <Card className="p-4">
       <div className={cn("flex items-center gap-2.5", open && "border-b pb-3")}>
-        <span className="bg-muted text-muted-foreground flex size-8 shrink-0 items-center justify-center rounded-md border">
+        <span
+          className={cn(
+            "flex size-8 shrink-0 items-center justify-center rounded-md border",
+            colorFor(field.id)
+          )}
+        >
           <Icon className="size-4" />
         </span>
         <div className="flex min-w-0 flex-1 flex-col">
           <span className="text-sm leading-none font-semibold">{name}</span>
-          <span className="text-muted-foreground mt-1 truncate text-xs">
+          <span className="mt-1 truncate text-xs text-muted-foreground">
             {subtitle}
           </span>
         </div>

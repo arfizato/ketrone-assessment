@@ -23,15 +23,24 @@ export async function getForm(id: string): Promise<Config | null> {
   return ConfigSchema.parse({ id: snap.id, ...snap.data() })
 }
 
-/** Lightweight id + title + status list for the admin /projects list. */
-export async function listForms(): Promise<
-  { id: string; title: string; status: FormStatus }[]
-> {
+export type FormSummary = {
+  id: string
+  title: string
+  status: FormStatus
+  fieldCount: number
+  subtitle?: string
+}
+
+/** Lightweight summaries (id, title, status, field count, subtitle) for the
+ *  /projects list — avoids shipping every form's full field array. */
+export async function listForms(): Promise<FormSummary[]> {
   const snap = await db.collection(FORMS).get()
   return snap.docs.map((d) => ({
     id: d.id,
     title: (d.get("title") as string) ?? "Untitled",
     status: (d.get("status") as FormStatus) ?? "active",
+    fieldCount: (d.get("fields") as unknown[] | undefined)?.length ?? 0,
+    subtitle: (d.get("subtitle") as string | undefined) || undefined,
   }))
 }
 

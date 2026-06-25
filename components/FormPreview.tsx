@@ -7,6 +7,7 @@ import { FieldInstance } from "./fieldForms/types"
 import { Button } from "./ui/button"
 import { Field, FieldLabel } from "./ui/field"
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
+import { Textarea } from "./ui/textarea"
 import {
   Select,
   SelectContent,
@@ -134,6 +135,14 @@ function PreviewField({
             variant={VALIDATION_VARIANT[data.validation ?? ""] ?? "text"}
             placeholder={data.placeholder}
           />
+        </Field>
+      )
+
+    case "textarea":
+      return (
+        <Field>
+          <PreviewLabel label={data.label} required={data.required} />
+          <Textarea placeholder={data.placeholder} rows={3} />
         </Field>
       )
 
