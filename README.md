@@ -31,3 +31,23 @@ loads one per `/projects/<id>` and the embed fetches it from `/api/forms/<id>`.
 Remaining: save/publish from the builder back to Firestore, HMAC-signed outbound
 webhooks + origin/domain checks on submit, IaC (Cloud Run + Terraform), and a full
 setup/security writeup to replace this section.
+
+# TODO:
+
+- improve navbar:
+  - reorder buttons to to have publish be the CTA and right most buton
+  - name field is centered in navbar + resize to fit
+- auto save (at least periodic)
+
+- form
+  - make fieldforms collapsable
+  - remove preview in field forms (file)
+  - add textarea?
+  - add title
+  - add description
+  - each formfield icon gets a random color to be able to differenciate between different text fields
+
+- /projects
+  - icon/thumbnail
+  - delete/dupe button
+  - status (active, archive, inactive)+ filters

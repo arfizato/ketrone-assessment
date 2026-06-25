@@ -36,4 +36,15 @@ describeEmu("forms-store (Firestore emulator)", () => {
     const list = await listForms()
     expect(list.find((f) => f.id === "frm_test_emu")?.title).toBe("Emu Co")
   })
+
+  test("createForm makes a blank, default-themed form that round-trips", async () => {
+    const { createForm, getForm } = await import("../lib/forms-store")
+    const id = await createForm("New Co")
+    expect(id).toMatch(/^frm_/)
+    const form = await getForm(id)
+    expect(form?.title).toBe("New Co")
+    expect(form?.fields).toEqual([])
+    // a real theme was stored (passes ConfigSchema on read)
+    expect(form?.theme.base).toBeTruthy()
+  })
 })

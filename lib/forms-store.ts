@@ -1,5 +1,7 @@
+import { randomUUID } from "node:crypto"
 import { db, FORMS } from "./firestore"
 import { ConfigSchema, type Config } from "./schemas"
+import { DEFAULT_THEME } from "./theme"
 
 /**
  * Firestore-backed form store. Each form is one document in the `forms`
@@ -27,4 +29,15 @@ export async function listForms(): Promise<{ id: string; title: string }[]> {
 export async function saveForm(config: Config): Promise<void> {
   const { id, ...body } = config
   await db.collection(FORMS).doc(id).set(body)
+}
+
+/**
+ * Create a blank form (default theme, no fields) and persist it. Returns the
+ * new id so the caller can navigate into the builder. Ids match the seed style:
+ * a short `frm_` prefix + random suffix.
+ */
+export async function createForm(title = "Untitled form"): Promise<string> {
+  const id = `frm_${randomUUID().replace(/-/g, "").slice(0, 9)}`
+  await saveForm({ id, title, theme: DEFAULT_THEME, fields: [] })
+  return id
 }

@@ -2,11 +2,9 @@
   {
     "id": "frm_8m2kd9q1",
     "title": "Create a Company",
-    "subtitle": "Corporate formation intake",
-    "submitLabel": "Start formation",
     "theme": {
       "base": "slate",
-      "accent": "#6366f1",
+      "accent": "#80ff80",
       "radius": 0.625,
       "font": "inter",
       "density": "compact",
@@ -32,9 +30,18 @@
           "label": "Entity Type",
           "required": true,
           "options": [
-            { "label": "LLC", "value": "LLC" },
-            { "label": "C-Corp", "value": "C-Corp" },
-            { "label": "S-Corp", "value": "S-Corp" }
+            {
+              "label": "LLC",
+              "value": "LLC"
+            },
+            {
+              "label": "C-Corp",
+              "value": "C-Corp"
+            },
+            {
+              "label": "S-Corp",
+              "value": "S-Corp"
+            }
           ]
         }
       },
@@ -45,11 +52,26 @@
           "label": "State of Incorporation",
           "required": true,
           "options": [
-            { "label": "Delaware", "value": "DE" },
-            { "label": "California", "value": "CA" },
-            { "label": "New York", "value": "NY" },
-            { "label": "Texas", "value": "TX" },
-            { "label": "Wyoming", "value": "WY" }
+            {
+              "label": "Delaware",
+              "value": "DE"
+            },
+            {
+              "label": "California",
+              "value": "CA"
+            },
+            {
+              "label": "New York",
+              "value": "NY"
+            },
+            {
+              "label": "Texas",
+              "value": "TX"
+            },
+            {
+              "label": "Wyoming",
+              "value": "WY"
+            }
           ]
         }
       },
@@ -59,9 +81,94 @@
         "data": {
           "label": "Shareholder List",
           "columns": [
-            { "label": "Name", "type": "Text" },
-            { "label": "Ownership", "type": "Percent" }
+            {
+              "label": "Name",
+              "type": "Text"
+            },
+            {
+              "label": "Ownership",
+              "type": "Percent"
+            }
           ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "frm_9e5cebb04",
+    "title": "job opening",
+    "theme": {
+      "base": "gray",
+      "accent": "#7c3aed",
+      "radius": 0.5,
+      "font": "roboto",
+      "density": "comfortable",
+      "shadow": "strong",
+      "container": "card",
+      "fieldStyle": "underlined",
+      "appearance": "light"
+    },
+    "fields": [
+      {
+        "id": "cf478f92-8078-4ef5-bbf0-b0b21259c611",
+        "type": "text",
+        "data": {
+          "label": "Full Name",
+          "placeholder": "Hmed Satour",
+          "required": true
+        }
+      },
+      {
+        "id": "70daa676-9748-4d7f-984d-87f12ae23bcd",
+        "type": "text",
+        "data": {
+          "label": "email",
+          "placeholder": "h.satour@google.com",
+          "required": true,
+          "validation": "Email"
+        }
+      },
+      {
+        "id": "c8db8df9-bfbf-42de-9cda-516d90c1c4f7",
+        "type": "text",
+        "data": {
+          "label": "Number",
+          "placeholder": "99352691",
+          "required": false,
+          "validation": "Number"
+        }
+      },
+      {
+        "id": "8bc78755-f6e4-4d06-8e37-02bcaa67cca7",
+        "type": "select",
+        "data": {
+          "label": "Contract type",
+          "placeholder": "",
+          "required": true,
+          "options": [
+            {
+              "label": "CDI",
+              "value": "cdi"
+            },
+            {
+              "label": "CDD",
+              "value": "cdd"
+            },
+            {
+              "label": "Freelance",
+              "value": "freelance"
+            }
+          ]
+        }
+      },
+      {
+        "id": "055c12ae-9afe-45ab-81bb-cd39db9f1866",
+        "type": "file",
+        "data": {
+          "label": "CV",
+          "placeholder": "10MB max",
+          "required": true,
+          "validation": "PDF"
         }
       }
     ]
@@ -109,9 +216,18 @@
           "label": "Contract Type",
           "required": true,
           "options": [
-            { "label": "NDA", "value": "NDA" },
-            { "label": "SaaS Agreement", "value": "SaaS" },
-            { "label": "Employment contract", "value": "Employment" }
+            {
+              "label": "NDA",
+              "value": "NDA"
+            },
+            {
+              "label": "SaaS Agreement",
+              "value": "SaaS"
+            },
+            {
+              "label": "Employment contract",
+              "value": "Employment"
+            }
           ]
         }
       },
@@ -123,9 +239,18 @@
           "required": true,
           "helperLabel": "High urgency triggers immediate escalation and priority billing.",
           "options": [
-            { "label": "Low", "value": "Low" },
-            { "label": "Medium", "value": "Medium" },
-            { "label": "High", "value": "High" }
+            {
+              "label": "Low",
+              "value": "Low"
+            },
+            {
+              "label": "Medium",
+              "value": "Medium"
+            },
+            {
+              "label": "High",
+              "value": "High"
+            }
           ]
         }
       },

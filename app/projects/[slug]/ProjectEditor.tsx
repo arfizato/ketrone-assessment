@@ -33,11 +33,15 @@ import {
   ArrowRight,
   Eye,
   Hammer,
+  Loader2,
   PanelBottom,
+  Save,
   SlidersHorizontal,
 } from "lucide-react"
 import Link from "next/link"
-import { useState, useSyncExternalStore } from "react"
+import { useState, useSyncExternalStore, useTransition } from "react"
+import { toast } from "sonner"
+import { saveFormAction } from "../actions"
 
 type View = "build" | "preview"
 type Step = "content" | "design"
@@ -103,14 +107,18 @@ function useSystemDark() {
 
 export default function ProjectEditor({
   slug,
-  title,
+  title: initialTitle,
   initialFields,
   initialTheme,
 }: ProjectEditorProps) {
   // --- the backbone: a single source of truth for the whole form ---
   // seeded from the form loaded on the server (by slug)
+  const [title, setTitle] = useState(initialTitle)
   const [form, setForm] = useState<FieldInstance[]>(initialFields)
   const [theme, setTheme] = useState<FormTheme>(initialTheme)
+  // any edit to title / fields / theme marks the form unsaved; cleared on save
+  const [dirty, setDirty] = useState(false)
+  const [isSaving, startSaving] = useTransition()
   // top-level step: build the content, then design it
   const [step, setStep] = useState<Step>("content")
   // below lg, the design controls open from a drawer over the preview
@@ -136,12 +144,14 @@ export default function ProjectEditor({
           : "light"
 
   const addField = (type: FieldType) => {
+    setDirty(true)
     setForm((prev) => [
       ...prev,
       { id: crypto.randomUUID(), type, data: { ...DEFAULT_FIELD_DATA[type] } },
     ])
   }
   const updateField = (id: string, patch: Partial<FieldData>) => {
+    setDirty(true)
     setForm((prev) =>
       prev.map((f) =>
         f.id === id ? { ...f, data: { ...f.data, ...patch } } : f
@@ -149,10 +159,12 @@ export default function ProjectEditor({
     )
   }
   const removeField = (id: string) => {
+    setDirty(true)
     setForm((prev) => prev.filter((f) => f.id !== id))
   }
   // insert a deep copy right after the original
   const duplicateField = (id: string) => {
+    setDirty(true)
     setForm((prev) => {
       const index = prev.findIndex((f) => f.id === id)
       if (index < 0) return prev
@@ -167,6 +179,7 @@ export default function ProjectEditor({
     })
   }
   const reorderField = (activeId: string, overId: string) => {
+    setDirty(true)
     setForm((prev) => {
       const oldIndex = prev.findIndex((f) => f.id === activeId)
       const newIndex = prev.findIndex((f) => f.id === overId)
@@ -175,13 +188,31 @@ export default function ProjectEditor({
     })
   }
 
-  const updateTheme = (patch: Partial<FormTheme>) =>
+  const updateTheme = (patch: Partial<FormTheme>) => {
+    setDirty(true)
     setTheme((t) => ({ ...t, ...patch }))
+  }
 
   // applying a preset keeps the user's chosen appearance (light/dark/system)
   // instead of snapping back to the preset's default
-  const applyPreset = (preset: FormTheme) =>
+  const applyPreset = (preset: FormTheme) => {
+    setDirty(true)
     setTheme((t) => ({ ...preset, appearance: t.appearance }))
+  }
+
+  // Persist the whole form (id + title + theme + fields) via the server action.
+  // On success the embed reflects it on its next no-store fetch — no redeploy.
+  const onSave = () => {
+    startSaving(async () => {
+      try {
+        await saveFormAction({ id: slug, title, theme, fields: form })
+        setDirty(false)
+        toast.success("Saved")
+      } catch {
+        toast.error("Couldn't save — please try again.")
+      }
+    })
+  }
 
   const builder = (
     <FormBuilder
@@ -267,11 +298,20 @@ export default function ProjectEditor({
           <Link
             href="/projects"
             aria-label="Back to forms"
-            className="text-muted-foreground transition-colors hover:text-foreground"
+            className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"
           >
             <ArrowLeft className="size-4" />
           </Link>
-          <span className="truncate text-sm font-medium">{title}</span>
+          <input
+            value={title}
+            onChange={(e) => {
+              setTitle(e.target.value)
+              setDirty(true)
+            }}
+            aria-label="Form title"
+            placeholder="Untitled form"
+            className="min-w-0 flex-1 truncate rounded-sm bg-transparent px-1 py-0.5 text-sm font-medium outline-none hover:bg-foreground/5 focus:bg-background focus:ring-1 focus:ring-ring"
+          />
         </div>
         <div className="flex justify-center">
           {step === "content" && bp === "md" && (
@@ -279,6 +319,19 @@ export default function ProjectEditor({
           )}
         </div>
         <div className="flex justify-end gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onSave}
+            disabled={!dirty || isSaving}
+          >
+            {isSaving ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Save className="size-4" />
+            )}
+            {isSaving ? "Saving…" : "Save"}
+          </Button>
           <EmbedDialog formId={slug} />
           {step === "content" ? (
             <Button size="sm" onClick={() => setStep("design")}>
