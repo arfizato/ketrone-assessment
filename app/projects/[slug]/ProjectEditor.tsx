@@ -5,6 +5,7 @@ import DesignPanel from "@/components/design/DesignPanel"
 import EmbedDialog from "@/components/EmbedDialog"
 import FormBuilder from "@/components/FormBuilder"
 import FormSettingsDialog, {
+  FormSettingsFields,
   type FormSettings,
 } from "@/components/FormSettingsDialog"
 import PreviewPanel from "@/components/PreviewPanel"
@@ -47,6 +48,7 @@ import {
   Loader2,
   PanelBottom,
   Save,
+  Settings2,
   SlidersHorizontal,
 } from "lucide-react"
 import Link from "next/link"
@@ -164,6 +166,8 @@ export default function ProjectEditor({
   const [step, setStep] = useState<Step>("content")
   // below lg, the design controls open from a drawer over the preview
   const [designDrawerOpen, setDesignDrawerOpen] = useState(false)
+  // sm: the form settings open from a drawer (the header is too tight)
+  const [settingsDrawerOpen, setSettingsDrawerOpen] = useState(false)
   // below lg, the preview lives behind a toggle instead of its own panel
   const [view, setView] = useState<View>("build")
   // sm only: the component palette opens from a bottom drawer
@@ -404,7 +408,10 @@ export default function ProjectEditor({
           {step === "content" && bp === "md" && (
             <ViewTabs value={view} onValueChange={setView} />
           )}
-          <FormSettingsDialog settings={settings} onChange={updateSettings} />
+          {/* settings lives in a drawer on mobile (see bottom navs) */}
+          {bp !== "sm" && (
+            <FormSettingsDialog settings={settings} onChange={updateSettings} />
+          )}
         </div>
         {/* form name: centered in the bar, sized to its content */}
         <div className="flex min-w-0 justify-center px-2">
@@ -479,23 +486,43 @@ export default function ProjectEditor({
       {step === "content" && bp === "sm" && (
         <nav className="flex h-16 shrink-0 items-center justify-between border-t bg-background px-4">
           <ViewTabs value={view} onValueChange={setView} />
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              setView("build")
-              setPaletteOpen(true)
-            }}
-          >
-            <PanelBottom className="size-4" />
-            Components
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSettingsDrawerOpen(true)}
+            >
+              <Settings2 className="size-4" />
+              Settings
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setView("build")
+                setPaletteOpen(true)
+              }}
+            >
+              <PanelBottom className="size-4" />
+              Components
+            </Button>
+          </div>
         </nav>
       )}
 
       {/* md / sm Design: open the theme controls drawer */}
       {step === "design" && bp !== "lg" && (
-        <nav className="flex h-16 shrink-0 items-center justify-end border-t bg-background px-4">
+        <nav className="flex h-16 shrink-0 items-center justify-end gap-2 border-t bg-background px-4">
+          {bp === "sm" && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSettingsDrawerOpen(true)}
+            >
+              <Settings2 className="size-4" />
+              Settings
+            </Button>
+          )}
           <Button
             variant="outline"
             size="sm"
@@ -537,6 +564,24 @@ export default function ProjectEditor({
               onApplyPreset={applyPreset}
               className="h-auto max-h-[70vh] overflow-auto"
             />
+          </DrawerContent>
+        </Drawer>
+      )}
+
+      {/* sm: form settings as a bottom drawer (replaces the header button) */}
+      {bp === "sm" && (
+        <Drawer open={settingsDrawerOpen} onOpenChange={setSettingsDrawerOpen}>
+          <DrawerContent>
+            <DrawerHeader>
+              <DrawerTitle>Form settings</DrawerTitle>
+              <DrawerDescription>
+                Where verified submissions are forwarded, and which sites may
+                embed this form.
+              </DrawerDescription>
+            </DrawerHeader>
+            <div className="max-h-[70vh] overflow-auto px-4 pb-4">
+              <FormSettingsFields settings={settings} onChange={updateSettings} />
+            </div>
           </DrawerContent>
         </Drawer>
       )}
