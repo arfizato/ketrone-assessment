@@ -66,6 +66,10 @@ export type FieldFormProps = {
   field: FieldInstance
   /** merge a patch into this field's data */
   update: (patch: Partial<FieldData>) => void
+  /** card collapse state — owned by the builder list so the action rail can
+   *  react to it (only reordering is available while collapsed) */
+  open: boolean
+  onToggle: () => void
 }
 
 /** Starting data when a field of a given type is first added. */

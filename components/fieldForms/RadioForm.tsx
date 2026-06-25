@@ -1,7 +1,6 @@
 "use client"
 
 import { Button } from "../ui/button"
-import { Card } from "../ui/card"
 import {
   Field,
   FieldDescription,
@@ -12,11 +11,11 @@ import {
 } from "../ui/field"
 import { Input } from "../ui/input"
 import { Switch } from "../ui/switch"
-import { FieldFormHeader } from "./FieldFormHeader"
+import { FieldFormCard } from "./FieldFormCard"
 import { FieldFormProps, SelectOption } from "./types"
 import { Plus, X } from "lucide-react"
 
-function RadioForm({ field, update }: FieldFormProps) {
+function RadioForm({ field, update, open, onToggle }: FieldFormProps) {
   const { data } = field
   const opts = data.options ?? []
 
@@ -31,8 +30,12 @@ function RadioForm({ field, update }: FieldFormProps) {
   const addOpt = () => setOpts([...opts, { label: "", value: "" }])
 
   return (
-    <Card className="p-4">
-      <FieldFormHeader type={field.type} />
+    <FieldFormCard
+      type={field.type}
+      label={data.label}
+      open={open}
+      onToggle={onToggle}
+    >
       <Field aria-required>
         <FieldLabel>Label</FieldLabel>
         <Input
@@ -105,7 +108,7 @@ function RadioForm({ field, update }: FieldFormProps) {
           onCheckedChange={(checked) => update({ required: checked })}
         />
       </Field>
-    </Card>
+    </FieldFormCard>
   )
 }
 

@@ -2,7 +2,12 @@
 
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
-import { createForm, saveForm } from "@/lib/forms-store"
+import {
+  createForm,
+  deleteForm,
+  duplicateForm,
+  saveForm,
+} from "@/lib/forms-store"
 import { ConfigSchema, type Config } from "@/lib/schemas"
 
 /**
@@ -26,4 +31,16 @@ export async function createFormAction(): Promise<void> {
   const id = await createForm()
   revalidatePath("/projects")
   redirect(`/projects/${id}`)
+}
+
+/** Duplicate a form (stays on the list; caller refreshes to show the copy). */
+export async function duplicateFormAction(id: string): Promise<void> {
+  await duplicateForm(id)
+  revalidatePath("/projects")
+}
+
+/** Delete a form. */
+export async function deleteFormAction(id: string): Promise<void> {
+  await deleteForm(id)
+  revalidatePath("/projects")
 }

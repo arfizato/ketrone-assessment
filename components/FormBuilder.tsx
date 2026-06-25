@@ -30,7 +30,7 @@ import {
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { Copy, GripVertical, LayoutTemplate, Trash2 } from "lucide-react"
-import { ComponentType } from "react"
+import { ComponentType, useState } from "react"
 
 const FIELD_COMPONENTS: Record<FieldType, ComponentType<FieldFormProps>> = {
   text: TextForm,
@@ -55,6 +55,9 @@ function SortableField({
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: field.id })
   const Comp = FIELD_COMPONENTS[field.type]
+  // collapse lives here (not in the card) so the rail can drop duplicate/delete
+  // when collapsed — only reordering stays, which keeps the row height tight
+  const [open, setOpen] = useState(true)
 
   return (
     <div
@@ -76,26 +79,35 @@ function SortableField({
         >
           <GripVertical className="size-4" />
         </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="Duplicate field"
-          onClick={duplicate}
-        >
-          <Copy className="size-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="Delete field"
-          className="text-destructive hover:text-destructive"
-          onClick={remove}
-        >
-          <Trash2 className="size-4" />
-        </Button>
+        {open && (
+          <>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Duplicate field"
+              onClick={duplicate}
+            >
+              <Copy className="size-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Delete field"
+              className="text-destructive hover:text-destructive"
+              onClick={remove}
+            >
+              <Trash2 className="size-4" />
+            </Button>
+          </>
+        )}
       </div>
       <div className="flex-1">
-        <Comp field={field} update={update} />
+        <Comp
+          field={field}
+          update={update}
+          open={open}
+          onToggle={() => setOpen((o) => !o)}
+        />
       </div>
     </div>
   )

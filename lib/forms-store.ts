@@ -48,6 +48,21 @@ export async function createForm(title = "Untitled form"): Promise<string> {
   return id
 }
 
+/** Delete a form. (Its submissions subcollection is left for a server-side
+ *  cleanup job; the client SDK can't recursively delete in one call.) */
+export async function deleteForm(id: string): Promise<void> {
+  await db.collection(FORMS).doc(id).delete()
+}
+
+/** Copy a form into a new id (title suffixed "(copy)"). Returns the new id. */
+export async function duplicateForm(id: string): Promise<string> {
+  const form = await getForm(id)
+  if (!form) throw new Error(`form ${id} not found`)
+  const newId = `frm_${randomUUID().replace(/-/g, "").slice(0, 9)}`
+  await saveForm({ ...form, id: newId, title: `${form.title} (copy)` })
+  return newId
+}
+
 /** Strip server-only secrets so the form is safe to send to the public embed. */
 export function toPublicForm(config: Config): PublicConfig {
   // PublicConfigSchema omits webhookUrl/webhookSecret/allowedOrigins, and Zod

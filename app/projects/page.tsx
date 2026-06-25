@@ -2,6 +2,7 @@ import Link from "next/link"
 import { Plus } from "lucide-react"
 import { listForms } from "@/lib/forms-store"
 import { Button } from "@/components/ui/button"
+import FormCardActions from "@/components/FormCardActions"
 import { createFormAction } from "./actions"
 
 export const dynamic = "force-dynamic"
@@ -35,16 +36,21 @@ export default async function ProjectsPage() {
       ) : (
         <ul className="grid gap-3 sm:grid-cols-2">
           {forms.map((f) => (
-            <li key={f.id}>
+            <li key={f.id} className="relative">
               <Link
                 href={`/projects/${f.id}`}
                 className="block rounded-lg border bg-card p-4 transition-colors hover:border-foreground/30 hover:bg-accent"
               >
-                <div className="font-medium">{f.title}</div>
+                <div className="truncate pr-16 font-medium">{f.title}</div>
                 <div className="mt-1 truncate font-mono text-xs text-muted-foreground">
                   {f.id}
                 </div>
               </Link>
+              <FormCardActions
+                id={f.id}
+                title={f.title}
+                className="absolute right-2 top-2"
+              />
             </li>
           ))}
         </ul>

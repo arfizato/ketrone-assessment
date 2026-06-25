@@ -1,6 +1,5 @@
 "use client"
 
-import { Card } from "../ui/card"
 import { Field, FieldDescription, FieldError, FieldLabel } from "../ui/field"
 import { Input } from "../ui/input"
 import {
@@ -12,15 +11,19 @@ import {
   SelectValue,
 } from "../ui/select"
 import { Switch } from "../ui/switch"
-import { FieldFormHeader } from "./FieldFormHeader"
+import { FieldFormCard } from "./FieldFormCard"
 import { FieldFormProps } from "./types"
 
-function TextForm({ field, update }: FieldFormProps) {
+function TextForm({ field, update, open, onToggle }: FieldFormProps) {
   const { data } = field
 
   return (
-    <Card className="p-4">
-      <FieldFormHeader type={field.type} />
+    <FieldFormCard
+      type={field.type}
+      label={data.label}
+      open={open}
+      onToggle={onToggle}
+    >
       <Field aria-required>
         <FieldLabel>Label</FieldLabel>
         <Input
@@ -74,7 +77,7 @@ function TextForm({ field, update }: FieldFormProps) {
           onCheckedChange={(checked) => update({ required: checked })}
         />
       </Field>
-    </Card>
+    </FieldFormCard>
   )
 }
 

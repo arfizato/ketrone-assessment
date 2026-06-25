@@ -1,7 +1,6 @@
 "use client"
 
 import { Button } from "../ui/button"
-import { Card } from "../ui/card"
 import {
   Field,
   FieldDescription,
@@ -20,13 +19,13 @@ import {
   SelectValue,
 } from "../ui/select"
 import { Switch } from "../ui/switch"
-import { FieldFormHeader } from "./FieldFormHeader"
+import { FieldFormCard } from "./FieldFormCard"
 import { FieldFormProps, TableColumn } from "./types"
 import { Plus, X } from "lucide-react"
 
 const COLUMN_TYPES = ["Text", "Number", "Currency", "Percent", "Date"]
 
-function TableForm({ field, update }: FieldFormProps) {
+function TableForm({ field, update, open, onToggle }: FieldFormProps) {
   const { data } = field
   const columns = data.columns ?? []
 
@@ -42,8 +41,12 @@ function TableForm({ field, update }: FieldFormProps) {
   const addColumn = () => setColumns([...columns, { label: "", type: "Text" }])
 
   return (
-    <Card className="p-4">
-      <FieldFormHeader type={field.type} />
+    <FieldFormCard
+      type={field.type}
+      label={data.label}
+      open={open}
+      onToggle={onToggle}
+    >
       <Field aria-required>
         <FieldLabel>Label</FieldLabel>
         <Input
@@ -117,32 +120,6 @@ function TableForm({ field, update }: FieldFormProps) {
         </Button>
       </FieldGroup>
 
-      {/* preview of the table the rendered field will show */}
-      {/* {columns.length > 0 && (
-        <div className="overflow-x-auto rounded-lg border">
-          <table className="w-full text-sm">
-            <thead className="bg-accent">
-              <tr>
-                {columns.map((col, i) => (
-                  <th key={i} className="px-3 py-2 text-left font-medium">
-                    {col.label.trim() || `Column ${i + 1}`}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="text-muted-foreground">
-                {columns.map((col, i) => (
-                  <td key={i} className="px-3 py-2 italic">
-                    {col.type.toLowerCase()}…
-                  </td>
-                ))}
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      )} */}
-
       <Field orientation="horizontal" className="w-full justify-between">
         <div>
           <FieldLabel>Required</FieldLabel>
@@ -153,7 +130,7 @@ function TableForm({ field, update }: FieldFormProps) {
           onCheckedChange={(checked) => update({ required: checked })}
         />
       </Field>
-    </Card>
+    </FieldFormCard>
   )
 }
 

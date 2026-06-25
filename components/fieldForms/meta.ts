@@ -17,7 +17,7 @@ export type FieldMeta = {
 /**
  * Single source of truth for how each field type presents itself: the icon and
  * copy shown in the palette (ComponentPalette) and on each builder card header
- * (FieldFormHeader). Add a field type here when you add one to FieldType.
+ * (FieldFormCard). Add a field type here when you add one to FieldType.
  */
 export const FIELD_META: Record<FieldType, FieldMeta> = {
   text: { name: "Text", desc: "Single-line input", icon: Type },

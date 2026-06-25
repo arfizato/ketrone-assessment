@@ -1,6 +1,5 @@
 "use client"
 
-import { Card } from "../ui/card"
 import { Field, FieldDescription, FieldError, FieldLabel } from "../ui/field"
 import { Input } from "../ui/input"
 import {
@@ -12,15 +11,19 @@ import {
   SelectValue,
 } from "../ui/select"
 import { Switch } from "../ui/switch"
-import { FieldFormHeader } from "./FieldFormHeader"
+import { FieldFormCard } from "./FieldFormCard"
 import { FieldFormProps } from "./types"
 
-function FileForm({ field, update }: FieldFormProps) {
+function FileForm({ field, update, open, onToggle }: FieldFormProps) {
   const { data } = field
 
   return (
-    <Card className="p-4">
-      <FieldFormHeader type={field.type} />
+    <FieldFormCard
+      type={field.type}
+      label={data.label}
+      open={open}
+      onToggle={onToggle}
+    >
       <Field aria-required>
         <FieldLabel>Label</FieldLabel>
         <Input
@@ -60,11 +63,6 @@ function FileForm({ field, update }: FieldFormProps) {
         </Select>
       </Field>
 
-      {/* preview of the large drop-zone the rendered field will show */}
-      <div className="rounded-lg border-2 border-dashed border-muted-foreground/25 p-8 text-center text-sm text-muted-foreground">
-        {data.placeholder?.trim() || "Drag & drop a file, or click to browse"}
-      </div>
-
       <Field orientation="horizontal" className="w-full justify-between">
         <div>
           <FieldLabel>Required</FieldLabel>
@@ -75,7 +73,7 @@ function FileForm({ field, update }: FieldFormProps) {
           onCheckedChange={(checked) => update({ required: checked })}
         />
       </Field>
-    </Card>
+    </FieldFormCard>
   )
 }
 
